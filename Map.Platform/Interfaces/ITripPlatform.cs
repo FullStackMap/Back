@@ -1,7 +1,7 @@
 ﻿using Map.Domain.Entities;
 
-namespace Map.Provider.Interfaces;
-public interface ITripProvider
+namespace Map.Platform.Interfaces;
+public interface ITripPlatform
 {
     /// <summary>
     /// Create a new trip asynchronously.
@@ -26,14 +26,14 @@ public interface ITripProvider
     /// <summary>
     /// Update a trip asynchronously
     /// </summary>
-    /// <param name="trip">A trip to update</param>
+    /// <param name="entity">A trip to update</param>
     /// <returns>Updated Trip</returns>
     public Task<Trip> UpdateAsync(Trip entity, Trip update);
 
     /// <summary>
     /// Delete a trip asynchronously
     /// </summary>
-    /// <param name="Trip">entity to delete</param>
+    /// <param name="entity">entity to delete</param>
     /// <returns>Task</returns>
     public void Delete(Trip entity);
 }

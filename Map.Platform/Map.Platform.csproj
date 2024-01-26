@@ -15,8 +15,4 @@
 		<ProjectReference Include="..\Map.Provider\Map.Provider.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Interfaces\" />
-	</ItemGroup>
-
 </Project>

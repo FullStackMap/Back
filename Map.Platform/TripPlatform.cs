@@ -1,9 +1,9 @@
 ﻿using Map.Domain.Entities;
 using Map.EFCore.Interfaces;
-using Map.Provider.Interfaces;
+using Map.Platform.Interfaces;
 
-namespace Map.Provider;
-public class TripProvider : ITripProvider
+namespace Map.Platform;
+public class TripPlatform : ITripPlatform
 {
     #region Props
 
@@ -13,7 +13,7 @@ public class TripProvider : ITripProvider
 
     #region Ctor
 
-    public TripProvider(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+    public TripPlatform(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
     #endregion
 
