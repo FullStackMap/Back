@@ -16,8 +16,4 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Map.EFCore\Map.EFCore.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Interfaces\" />
-	</ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Map.Provider.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Map.Provider.Extensions;
 
@@ -11,7 +12,7 @@ public static class IServiceCollectionExtensions
     /// <returns>An IServiceCollection.</returns>
     public static IServiceCollection AddProviders(this IServiceCollection services)
     {
-
+        services.AddScoped<ITripProvider, TripProvider>();
         return services;
     }
 }
