@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using Map.API.Models.TripDto;
@@ -11,7 +12,8 @@ using static Map.API.Controllers.Models.HttpError;
 namespace Map.API.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[ApiVersion(ApiControllerVersions.V1)]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class TripController : ControllerBase
 {
     #region Props
@@ -40,6 +42,7 @@ public class TripController : ControllerBase
     //[AllowAnonymous]
     //[HttpPost]
     //[Route("Initialize")]
+    //[MapToApiVersion(ApiControllerVersions.V1)]
     //public async Task<IActionResult> Initialize([FromServices] DBInitializer dBInitializer)
     //{
     //    bool result = await dBInitializer.Initialize();
@@ -50,6 +53,7 @@ public class TripController : ControllerBase
 
     [HttpPost]
     [Route("")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
     public async Task<IActionResult> AddTrip([FromBody] AddTripDto addTripDto)
     {
         ValidationResult validationResult = await _addTripValidator.ValidateAsync(addTripDto);

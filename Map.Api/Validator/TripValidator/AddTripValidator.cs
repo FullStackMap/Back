@@ -63,7 +63,7 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
                 List<Trip>? tripList = await tripPlatform.GetTripListByUserIdAsync(dto.UserId);
                 return tripList.All(trip => trip.Name.ToUpper() != name.ToUpper());
             })
-            .WithMessage((trip) => $"The account with id: {trip.UserId}. Allready have trip with name : {trip.Name}")
+            .WithMessage((trip) => $"The account with id: {trip.UserId}. Allready has a trip with name : {trip.Name}")
             .WithErrorCode(nameof(ETripErrorCodes.TripNameUniqueByUser));
 
 

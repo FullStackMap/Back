@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Asp.Versioning;
+using FluentValidation;
 using Map.API.AutoMapperProfies;
+using Map.API.Configuration;
 using Map.API.Models.TripDto;
 using Map.API.Validator.TripValidator;
 using Map.Domain.Entities;
@@ -8,8 +10,8 @@ using Map.EFCore.Extensions;
 using Map.Platform.Extensions;
 using Map.Provider.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Security.Claims;
 
 namespace Map.API.Extension;
@@ -23,19 +25,8 @@ public static class ServiceCollectionExtensions
     public static void ConfigureSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
-        {
-            string? API_NAME = Assembly.GetExecutingAssembly().GetName().Name;
-            string xmlPath = $"{AppContext.BaseDirectory}{API_NAME}.xml";
-
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = API_NAME,
-                Description = "MAP API",
-            });
-            c.IncludeXmlComments(xmlPath);
-        });
+        services.AddSingleton<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerGenOptions>();
+        services.AddSwaggerGen(options => options.OperationFilter<SwaggerDefaultValues>());
     }
 
     /// <summary>
@@ -142,5 +133,22 @@ public static class ServiceCollectionExtensions
             };
         });
         return services;
+    }
+
+    public static void ConfigureApiVersionning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        }).AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = $"'v'VVV";
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.SubstituteApiVersionInUrl = true;
+            options.SubstitutionFormat = "VVV";
+        });
     }
 }
