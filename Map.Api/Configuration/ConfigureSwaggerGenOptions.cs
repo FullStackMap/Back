@@ -26,7 +26,6 @@ public class ConfigureSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
                 {
                     Title = API_NAME,
                     Version = description.GroupName,
-                    Description = "OpenAPI description for Elcia C3PO API",
                 });
 
         string xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

@@ -51,9 +51,19 @@ public class TripController : ControllerBase
     //    return Ok(resultMessage);
     //}
 
+    /// <summary>
+    /// Create a new trip
+    /// </summary>
+    /// <param name="addTripDto">addTripDto</param>
     [HttpPost]
     [Route("")]
     [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(TripDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddTrip([FromBody] AddTripDto addTripDto)
     {
         ValidationResult validationResult = await _addTripValidator.ValidateAsync(addTripDto);
