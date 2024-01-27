@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Models.TripDto;
 using Map.API.Validator.TripValidator;
@@ -10,6 +10,7 @@ using Map.Provider.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace Map.API.Extension;
 
@@ -76,6 +77,7 @@ public static class ServiceCollectionExtensions
             .AddProviders()
             .AddValidators()
             .AddRepositories()
+            .AddDBInitializer()
             .AddIdentity();
 
         services.AddControllers();
@@ -96,4 +98,49 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    private static IServiceCollection AddIdentity(this IServiceCollection services)
+    {
+        services.AddIdentity<MapUser, IdentityRole<Guid>>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+
+            options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+            options.ClaimsIdentity.UserIdClaimType = "Id";
+            options.ClaimsIdentity.UserNameClaimType = "UserName";
+            options.ClaimsIdentity.EmailClaimType = ClaimTypes.Email;
+
+            //Password requirement
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequiredUniqueChars = 4; //Determine le nombre de caractère unnique minimum requis
+
+            //Lockout si mdp fail 5 fois alors compte bloquer 60 min
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(60);
+            options.Lockout.AllowedForNewUsers = true;
+
+            //User
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            options.User.RequireUniqueEmail = true;
+
+            //Sign
+            options.SignIn.RequireConfirmedAccount = true;
+        })
+        .AddDefaultTokenProviders()
+        .AddRoles<IdentityRole<Guid>>()
+        .AddEntityFrameworkStores<MapContext>();
+
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+        });
+        return services;
+    }
 }

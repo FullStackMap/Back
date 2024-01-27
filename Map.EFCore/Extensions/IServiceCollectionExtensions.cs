@@ -14,4 +14,11 @@ public static class IServiceCollectionExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddDBInitializer(this IServiceCollection services)
+    {
+        services.AddScoped<DBInitializer>();
+
+        return services;
+    }
 }
