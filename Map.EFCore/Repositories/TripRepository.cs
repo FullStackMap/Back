@@ -1,5 +1,6 @@
 ﻿using Map.Domain.Entities;
 using Map.EFCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Map.EFCore.Repositories;
 public class TripRepository : GenericRepository<Trip>, ITripRepository
@@ -8,6 +9,10 @@ public class TripRepository : GenericRepository<Trip>, ITripRepository
     {
     }
 
+    /// <inheritdoc/>
+    public Task<List<Trip>> GetAllWhereUserId(Guid UserId) => _context.Trip.Where(t => t.UserId == UserId).ToListAsync();
+
+    /// <inheritdoc/>
     public async Task<Trip> UpdateAsync(Trip trip, Trip update)
     {
         trip.UserId = update.UserId;

@@ -20,7 +20,7 @@ public class TripPlatform : ITripPlatform
     #region PublicMethods
 
     /// <inheritdoc/>
-    public async Task CreateAsync(Trip entity)
+    public async Task AddTripAsync(Trip entity)
     {
         await _unitOfWork.Trip.AddAsync(entity);
         await _unitOfWork.CompleteAsync();
@@ -31,6 +31,9 @@ public class TripPlatform : ITripPlatform
 
     /// <inheritdoc/>
     public async Task<IList<Trip>> GetAllAsync() => await _unitOfWork.Trip.GetAllAsync();
+
+    /// <inheritdoc/>
+    public async Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId) => await _unitOfWork.Trip.GetAllWhereUserId(userId);
 
     /// <inheritdoc/>
     public async Task<Trip> UpdateAsync(Trip trip, Trip update)

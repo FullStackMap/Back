@@ -30,9 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="AutoMapperProfies\" />
-		<Folder Include="Dto\" />
-		<Folder Include="Validator\" />
+		<Folder Include="Models\MapUserDto\" />
 		<Folder Include="wwwroot\swagger\v1\" />
 	</ItemGroup>
 

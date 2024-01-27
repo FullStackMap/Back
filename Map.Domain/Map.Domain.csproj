@@ -13,7 +13,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="ErrorCodes\" />
 	  <Folder Include="Extension\" />
 	  <Folder Include="Models\" />
 	</ItemGroup>

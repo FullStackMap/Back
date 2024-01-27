@@ -1,6 +1,13 @@
-﻿using Map.EFCore.Extensions;
+using FluentValidation;
+using Map.API.AutoMapperProfies;
+using Map.API.Models.TripDto;
+using Map.API.Validator.TripValidator;
+using Map.Domain.Entities;
+using Map.EFCore;
+using Map.EFCore.Extensions;
 using Map.Platform.Extensions;
 using Map.Provider.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -55,10 +62,7 @@ public static class ServiceCollectionExtensions
     /// Adds the auto mapper configuration.
     /// </summary>
     /// <param name="services">The services.</param>
-    public static void AddAutoMapperConfiguration(this IServiceCollection services)
-    {
-
-    }
+    public static void AddAutoMapperConfiguration(this IServiceCollection services) => services.AddAutoMapper(typeof(TripProfiles));
 
 
     /// <summary>
@@ -71,7 +75,8 @@ public static class ServiceCollectionExtensions
         services.AddPlatforms()
             .AddProviders()
             .AddValidators()
-            .AddRepositories();
+            .AddRepositories()
+            .AddIdentity();
 
         services.AddControllers();
     }
@@ -81,9 +86,14 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The services.</param>
     /// <returns>An IServiceCollection.</returns>
-    public static IServiceCollection AddValidators(this IServiceCollection services)
+    private static IServiceCollection AddValidators(this IServiceCollection services)
     {
+        #region TripValidator
 
+        services.AddScoped<IValidator<AddTripDto>, AddTripValidator>();
+
+        #endregion
         return services;
     }
+
 }

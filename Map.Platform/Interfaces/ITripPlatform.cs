@@ -8,7 +8,7 @@ public interface ITripPlatform
     /// </summary>
     /// <param name="trip">Entity to create</param>
     /// <returns>Trip</returns>
-    public Task CreateAsync(Trip entity);
+    public Task AddTripAsync(Trip entity);
 
     /// <summary>
     /// Get one trip asynchronously by id
@@ -36,4 +36,11 @@ public interface ITripPlatform
     /// <param name="entity">entity to delete</param>
     /// <returns>Task</returns>
     public void Delete(Trip entity);
+
+    /// <summary>
+    /// Get all trips asynchronously by user id
+    /// </summary>
+    /// <param name="userId">Id of user</param>
+    /// <returns>List of trip or null</returns>
+    Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId);
 }
