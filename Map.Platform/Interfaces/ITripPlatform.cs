@@ -15,13 +15,20 @@ public interface ITripPlatform
     /// </summary>
     /// <param name="tripId">Id of the wanted trip</param>
     /// <returns>trip or null</returns>
-    public Task<Trip?> GetByIdAsync(Guid tripId);
+    public Task<Trip?> GetTripByIdAsync(Guid tripId);
 
     /// <summary>
     /// Get all trips asynchronously
     /// </summary>
     /// <returns>List of trips</returns>
-    public Task<IList<Trip>> GetAllAsync();
+    public Task<List<Trip>> GetAllAsync();
+
+    /// <summary>
+    /// Get all trips asynchronously by user id
+    /// </summary>
+    /// <param name="userId">Id of user</param>
+    /// <returns>List of trip or null</returns>
+    Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId);
 
     /// <summary>
     /// Update a trip asynchronously
@@ -36,11 +43,4 @@ public interface ITripPlatform
     /// <param name="entity">entity to delete</param>
     /// <returns>Task</returns>
     public void Delete(Trip entity);
-
-    /// <summary>
-    /// Get all trips asynchronously by user id
-    /// </summary>
-    /// <param name="userId">Id of user</param>
-    /// <returns>List of trip or null</returns>
-    Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId);
 }

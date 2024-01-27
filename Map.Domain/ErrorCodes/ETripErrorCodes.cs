@@ -16,4 +16,5 @@ public enum ETripErrorCodes
     TripEndDateNotEqualStartDate = 113,
     TripNameMinLength = 114,
     TripNameUniqueByUser = 115,
+    TripNotFoundById = 116,
 }

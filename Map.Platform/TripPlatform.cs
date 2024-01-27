@@ -27,10 +27,10 @@ public class TripPlatform : ITripPlatform
     }
 
     /// <inheritdoc/>
-    public async Task<Trip?> GetByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetByIdAsync(tripId);
+    public async Task<Trip?> GetTripByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetByIdAsync(tripId);
 
     /// <inheritdoc/>
-    public async Task<IList<Trip>> GetAllAsync() => await _unitOfWork.Trip.GetAllAsync();
+    public async Task<List<Trip>> GetAllAsync() => await _unitOfWork.Trip.GetAllAsync();
 
     /// <inheritdoc/>
     public async Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId) => await _unitOfWork.Trip.GetAllWhereUserId(userId);
@@ -49,5 +49,6 @@ public class TripPlatform : ITripPlatform
         _unitOfWork.Trip.Remove(entity);
         _unitOfWork.Complete();
     }
+
     #endregion
 }
