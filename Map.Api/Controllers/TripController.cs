@@ -139,4 +139,29 @@ public class TripController : ControllerBase
 
         return Ok(_mapper.Map<List<Trip>, List<TripDto>>(entities));
     }
+
+
+    /// <summary>
+    /// Delete a trip by id
+    /// </summary>
+    /// <param name="tripId">Trip Id of delete trip</param>
+    [HttpDelete]
+    [Route("{tripId}")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(TripDto), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteTripById([FromRoute] Guid tripId)
+    {
+        Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
+        if (trip is null)
+            return NotFound(new Error(nameof(ETripErrorCodes.TripNotFoundById), $"Trip with id: {tripId} not found"));
+
+        _tripPlatform.Delete(trip);
+
+        return NoContent();
+    }
 }
