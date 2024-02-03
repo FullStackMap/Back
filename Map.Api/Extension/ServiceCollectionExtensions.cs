@@ -84,6 +84,7 @@ public static class ServiceCollectionExtensions
         #region TripValidator
 
         services.AddScoped<IValidator<AddTripDto>, AddTripValidator>();
+        services.AddScoped<IValidator<UpdateTripDto>, UpdateTripValidator>();
 
         #endregion
         return services;

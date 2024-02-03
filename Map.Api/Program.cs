@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Ajout du MapContext
 builder.Services.AddMapDbContext(builder.Configuration);
 
 //Configure Cors

@@ -23,6 +23,7 @@ public class TripController : ControllerBase
     private readonly UserManager<MapUser> _userManager;
 
     private readonly IValidator<AddTripDto> _addTripValidator;
+    private readonly IValidator<UpdateTripDto> _updateTripValidator;
 
     private readonly IMapper _mapper;
 
@@ -30,11 +31,16 @@ public class TripController : ControllerBase
 
     #region Ctor
 
-    public TripController(ITripPlatform tripPlatform, UserManager<MapUser> userManager, IValidator<AddTripDto> addTripValidator, IMapper mapper)
+    public TripController(ITripPlatform tripPlatform,
+                          UserManager<MapUser> userManager,
+                          IValidator<AddTripDto> addTripValidator,
+                          IValidator<UpdateTripDto> updateTripValidator,
+                          IMapper mapper)
     {
         _tripPlatform = tripPlatform ?? throw new ArgumentNullException(nameof(tripPlatform));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _addTripValidator = addTripValidator ?? throw new ArgumentNullException(nameof(addTripValidator));
+        _updateTripValidator = updateTripValidator ?? throw new ArgumentNullException(nameof(updateTripValidator));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
@@ -140,6 +146,33 @@ public class TripController : ControllerBase
         return Ok(_mapper.Map<List<Trip>, List<TripDto>>(entities));
     }
 
+    //PUT de Trip
+    /// <summary>
+    /// definir le verbe http et la route
+    /// donné version constrolerapi définir les statusCode 
+    /// décalrer methode avec les parametres (si necessaire) créer dto 
+    /// définir les règles de validation
+    /// appeller l'orm 
+    /// retourner le resultat
+    /// </summary>
+    [HttpPut]
+    [Route("{tripId}")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(TripDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateTripAsync([FromRoute] Guid tripId, [FromBody] UpdateTripDto updateTripDto)
+    {
+        // validator 
+        ValidationResult validationResult = await _updateTripValidator.ValidateAsync(updateTripDto);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        return Ok();
+
+    }
 
     /// <summary>
     /// Delete a trip by id
@@ -154,7 +187,7 @@ public class TripController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteTripById([FromRoute] Guid tripId)
+    public async Task<IActionResult> DeleteTripByIdAsync([FromRoute] Guid tripId)
     {
         Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
         if (trip is null)

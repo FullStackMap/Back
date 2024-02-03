@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Map.API.Models.TripDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
@@ -7,23 +7,24 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.TripValidator;
 
-public class AddTripValidator : AbstractValidator<AddTripDto>
+public class UpdateTripValidator : AbstractValidator<UpdateTripDto>
 {
-    public AddTripValidator(ITripPlatform tripPlatform, UserManager<MapUser> userManager)
+    public UpdateTripValidator(ITripPlatform tripPlatform, UserManager<MapUser> userManager)
     {
         if (tripPlatform is null) throw new ArgumentNullException(nameof(tripPlatform));
         if (userManager is null) throw new ArgumentNullException(nameof(userManager));
 
         #region Dto
 
-        //Check if the dto is null
+        //Check if Dto is not null 
         RuleFor(dto => dto)
             .NotEmpty()
             .WithErrorCode(nameof(ETripErrorCodes.TripDtoNull))
-            .WithMessage("Trip Dto canno't be null");
+            .WithMessage("Update Trip Dto canno't be null");
 
         #endregion
 
+        
         #region UserId
 
         //Check if the UserId is not empty
@@ -56,16 +57,7 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
             //Check if the name is not shorter than 3 characters
             .MinimumLength(3)
             .WithErrorCode(nameof(ETripErrorCodes.TripNameMinLength))
-            .WithMessage("Name cannot be shorter than 3 characters")
-            //Check if the name is unique in trip list of the user
-            .MustAsync(async (dto, name, cancellationToken) =>
-            {
-                List<Trip>? tripList = await tripPlatform.GetTripListByUserIdAsync(dto.UserId);
-                return tripList.All(trip => trip.Name.ToUpper() != name.ToUpper());
-            })
-            .WithErrorCode(nameof(ETripErrorCodes.TripNameUniqueByUser))
-            .WithMessage((trip) => $"The account with id: {trip.UserId}. Allready has a trip with name : {trip.Name}");
-
+            .WithMessage("Name cannot be shorter than 3 characters");
 
         #endregion
 
