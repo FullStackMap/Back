@@ -1,6 +1,7 @@
 ﻿using Map.Domain.Entities;
 using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
+using Map.Domain.Models.TripDto;
 
 namespace Map.Platform;
 public class TripPlatform : ITripPlatform
@@ -36,7 +37,7 @@ public class TripPlatform : ITripPlatform
     public async Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId) => await _unitOfWork.Trip.GetAllWhereUserId(userId);
 
     /// <inheritdoc/>
-    public async Task<Trip> UpdateAsync(Trip trip, Trip update)
+    public async Task<Trip> UpdateTripAsync(Trip trip, UpdateTripDto update)
     {
         trip = await _unitOfWork.Trip.UpdateAsync(trip, update);
         await _unitOfWork.CompleteAsync();

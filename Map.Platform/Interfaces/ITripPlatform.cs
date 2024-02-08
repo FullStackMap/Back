@@ -1,4 +1,5 @@
 ﻿using Map.Domain.Entities;
+using Map.Domain.Models.TripDto;
 
 namespace Map.Platform.Interfaces;
 public interface ITripPlatform
@@ -35,7 +36,7 @@ public interface ITripPlatform
     /// </summary>
     /// <param name="entity">A trip to update</param>
     /// <returns>Updated Trip</returns>
-    public Task<Trip> UpdateAsync(Trip entity, Trip update);
+    public Task<Trip> UpdateTripAsync(Trip entity, UpdateTripDto update);
 
     /// <summary>
     /// Delete a trip asynchronously

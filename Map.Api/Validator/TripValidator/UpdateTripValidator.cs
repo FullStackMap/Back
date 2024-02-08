@@ -1,7 +1,7 @@
 using FluentValidation;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
+using Map.Domain.Models.TripDto;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
@@ -24,7 +24,7 @@ public class UpdateTripValidator : AbstractValidator<UpdateTripDto>
 
         #endregion
 
-        
+
         #region UserId
 
         //Check if the UserId is not empty
@@ -36,7 +36,7 @@ public class UpdateTripValidator : AbstractValidator<UpdateTripDto>
         .MustAsync(async (trip, userId, cancellationToken) =>
         {
             MapUser? user = await userManager.FindByIdAsync(userId.ToString());
-            return user is not null; 
+            return user is not null;
         })
         .WithErrorCode(nameof(EMapUserErrorCodes.UserNotFoundById))
         .WithMessage("User not found");
@@ -81,15 +81,7 @@ public class UpdateTripValidator : AbstractValidator<UpdateTripDto>
             //Check the date type
             .Must(startDate => startDate is DateOnly)
             .WithErrorCode(nameof(ETripErrorCodes.TripStartDateNotDateOnly))
-            .WithMessage("StartDate must be of type DateOnly")
-            //Check if the start date is not in the past
-            .Must(startDate =>
-            {
-                DateOnly today = DateOnly.FromDateTime(DateTime.Now);
-                return startDate >= today;
-            })
-            .WithErrorCode(nameof(ETripErrorCodes.TripStartDateNotInPast))
-            .WithMessage("StartDate cannot be in the past");
+            .WithMessage("StartDate must be of type DateOnly");
 
         #endregion
 

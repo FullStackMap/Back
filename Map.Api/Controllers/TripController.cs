@@ -5,6 +5,7 @@ using FluentValidation.Results;
 using Map.API.Models.TripDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
+using Map.Domain.Models.TripDto;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -146,32 +147,38 @@ public class TripController : ControllerBase
         return Ok(_mapper.Map<List<Trip>, List<TripDto>>(entities));
     }
 
-    //PUT de Trip
     /// <summary>
-    /// definir le verbe http et la route
-    /// donné version constrolerapi définir les statusCode 
-    /// décalrer methode avec les parametres (si necessaire) créer dto 
-    /// définir les règles de validation
-    /// appeller l'orm 
-    /// retourner le resultat
+    /// Update or Create a trip
     /// </summary>
+    /// <param name="tripId">Id of updated trip</param>
+    /// <param name="updateTripDto">UpdateTripDto</param>
+    /// <returns>Updated trip if tripId founded Or Created Trip</returns>
     [HttpPut]
     [Route("{tripId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
     [ProducesResponseType(typeof(TripDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TripDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateTripAsync([FromRoute] Guid tripId, [FromBody] UpdateTripDto updateTripDto)
+    public async Task<ActionResult<TripDto>> UpdateTripAsync([FromRoute] Guid tripId, [FromBody] UpdateTripDto updateTripDto)
     {
-        // validator 
         ValidationResult validationResult = await _updateTripValidator.ValidateAsync(updateTripDto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
-        return Ok();
+        Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
+        if (trip is null)
+        {
+            Trip entity = _mapper.Map<UpdateTripDto, Trip>(updateTripDto);
+            await _tripPlatform.AddTripAsync(entity);
 
+            return CreatedAtAction(nameof(GetTripById), new { tripId = entity.TripId }, _mapper.Map<Trip, TripDto>(entity));
+        }
+
+        Trip? tripUpdate = await _tripPlatform.UpdateTripAsync(trip, updateTripDto);
+        return _mapper.Map<Trip, TripDto>(tripUpdate);
     }
 
     /// <summary>

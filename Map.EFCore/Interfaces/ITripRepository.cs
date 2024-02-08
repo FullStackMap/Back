@@ -1,4 +1,5 @@
 using Map.Domain.Entities;
+using Map.Domain.Models.TripDto;
 
 namespace Map.EFCore.Interfaces;
 
@@ -17,5 +18,5 @@ public interface ITripRepository : IGenericRepository<Trip>
     /// <param name="trip">entity</param>
     /// <param name="update">update of entity</param>
     /// <returns>new trip version</returns>
-    Task<Trip> UpdateAsync(Trip trip, Trip update);
+    Task<Trip> UpdateAsync(Trip trip, UpdateTripDto update);
 }

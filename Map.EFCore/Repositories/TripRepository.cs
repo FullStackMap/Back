@@ -1,4 +1,5 @@
 ﻿using Map.Domain.Entities;
+using Map.Domain.Models.TripDto;
 using Map.EFCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,9 @@ public class TripRepository : GenericRepository<Trip>, ITripRepository
     public Task<List<Trip>> GetAllWhereUserId(Guid UserId) => _context.Trip.Where(t => t.UserId == UserId).ToListAsync();
 
     /// <inheritdoc/>
-    public async Task<Trip> UpdateAsync(Trip trip, Trip update)
+    public async Task<Trip> UpdateAsync(Trip trip, UpdateTripDto update)
     {
         trip.UserId = update.UserId;
-        trip.User = update.User;
         trip.Name = update.Name;
         trip.Description = update.Description;
         trip.StartDate = update.StartDate;

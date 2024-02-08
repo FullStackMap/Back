@@ -5,6 +5,7 @@ using Map.API.Configuration;
 using Map.API.Models.TripDto;
 using Map.API.Validator.TripValidator;
 using Map.Domain.Entities;
+using Map.Domain.Models.TripDto;
 using Map.EFCore;
 using Map.EFCore.Extensions;
 using Map.Platform.Extensions;

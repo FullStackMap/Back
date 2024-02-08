@@ -11,6 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Models\MapUserDto\**" />
+	  <Content Remove="Models\MapUserDto\**" />
+	  <EmbeddedResource Remove="Models\MapUserDto\**" />
+	  <None Remove="Models\MapUserDto\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Asp.Versioning.Http" Version="8.0.0" />
 		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
@@ -34,7 +41,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Models\MapUserDto\" />
 		<Folder Include="wwwroot\swagger\v1\" />
 	</ItemGroup>
 

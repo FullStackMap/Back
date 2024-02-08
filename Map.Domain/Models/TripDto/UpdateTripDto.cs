@@ -1,4 +1,4 @@
-namespace Map.API.Models.TripDto;
+namespace Map.Domain.Models.TripDto;
 
 /// <summary>
 /// Dto for udpate a trip.
