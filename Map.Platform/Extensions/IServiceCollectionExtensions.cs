@@ -12,6 +12,7 @@ public static class IServiceCollectionExtensions
     /// <returns>An IServiceCollection.</returns>
     public static IServiceCollection AddPlatforms(this IServiceCollection services)
     {
+        services.AddScoped<IAuthPlatform, AuthPlatform>();
         services.AddScoped<ITripPlatform, TripPlatform>();
 
         return services;

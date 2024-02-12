@@ -3,9 +3,12 @@ using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
 using Map.API.Models.TripDto;
+using Map.API.Validator.AuthValidator;
 using Map.API.Validator.TripValidator;
 using Map.Domain.Entities;
+using Map.Domain.Models.AuthDto;
 using Map.Domain.Models.TripDto;
+using Map.Domain.Settings;
 using Map.EFCore;
 using Map.EFCore.Extensions;
 using Map.Platform.Extensions;
@@ -55,7 +58,8 @@ public static class ServiceCollectionExtensions
     /// Adds the auto mapper configuration.
     /// </summary>
     /// <param name="services">The services.</param>
-    public static void AddAutoMapperConfiguration(this IServiceCollection services) => services.AddAutoMapper(typeof(TripProfiles));
+    public static void AddAutoMapperConfiguration(this IServiceCollection services) => services.AddAutoMapper(typeof(TripProfiles))
+                                                                                               .AddAutoMapper(typeof(UserProfiles));
 
 
     /// <summary>
@@ -65,7 +69,8 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration">The configuration.</param>
     public static void AddServices(this IServiceCollection services, ConfigurationManager configuration)
     {
-        services.AddPlatforms()
+        services.AddSettings(configuration)
+            .AddPlatforms()
             .AddProviders()
             .AddValidators()
             .AddRepositories()
@@ -73,6 +78,24 @@ public static class ServiceCollectionExtensions
             .AddIdentity();
 
         services.AddControllers();
+    }
+    
+    /// <summary>
+    /// Add settings as services
+    /// </summary>
+    /// <param name="services">The Services</param>
+    public static IServiceCollection AddSettings(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        JWTSettings JWTSettings = configuration.GetSection("JWTSettings").Get<JWTSettings>() ?? throw new ArgumentNullException(nameof(JWTSettings));
+        services.AddSingleton(JWTSettings);
+
+        MailSettings mailSettings = configuration.GetSection("MailSettings").Get<MailSettings>() ?? throw new ArgumentNullException(nameof(mailSettings));
+        services.AddSingleton(mailSettings);
+
+        RegisterSettings registerSettings = configuration.GetSection("RegisterSettings").Get<RegisterSettings>() ?? throw new ArgumentNullException(nameof(registerSettings));
+        services.AddSingleton(registerSettings);
+
+        return services;
     }
 
     /// <summary>
@@ -87,6 +110,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidator<AddTripDto>, AddTripValidator>();
         services.AddScoped<IValidator<UpdateTripDto>, UpdateTripValidator>();
 
+        #endregion
+
+        #region AuthValidator
+        services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
         #endregion
         return services;
     }
