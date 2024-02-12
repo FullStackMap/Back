@@ -9,4 +9,5 @@ namespace Map.Domain.ErrorCodes;
 public enum EAuthErrorCodes
 {
     DtoNotNull = 201,
+    TokenNotEmpty = 202,
 }

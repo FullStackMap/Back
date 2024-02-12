@@ -23,18 +23,20 @@ public class AuthController : ControllerBase
     #region Props
     private readonly UserManager<MapUser> _userManager;
     private readonly IValidator<RegisterDto> _registerValidator;
+    private readonly IValidator<ConfirmMailDto> _confirmMailValidator;
     private readonly IAuthPlatform _authPlatform;
     private readonly IMapper _mapper;
 
     #endregion
 
     #region Ctor
-    public AuthController(UserManager<MapUser> userManager, IValidator<RegisterDto> registerValidator, IMapper mapper, IAuthPlatform authPlatform)
+    public AuthController(UserManager<MapUser> userManager, IValidator<RegisterDto> registerValidator, IMapper mapper, IAuthPlatform authPlatform, IValidator<ConfirmMailDto> confirmMailValidator)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _registerValidator = registerValidator ?? throw new ArgumentNullException(nameof(registerValidator));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(registerValidator));
         _authPlatform = authPlatform ?? throw new ArgumentNullException(nameof(authPlatform));
+        _confirmMailValidator = confirmMailValidator ?? throw new ArgumentNullException(nameof(confirmMailValidator));
     }
 
     #endregion
@@ -86,6 +88,31 @@ public class AuthController : ControllerBase
         //await _mailPlatform.SendMailAsync(mailDTO);
 
         return Created();
+    }
+
+    [HttpPost]
+    [Route("ConfirmEmail")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    //[ProducesResponseType(typeof(TripDto), StatusCodes.Status201Created)]
+    //[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmMailDto confirmMailDto)
+    {
+        ValidationResult validationResult = await _confirmMailValidator.ValidateAsync(confirmMailDto);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+        }
+
+        MapUser? user = await _userManager.FindByEmailAsync(confirmMailDto.Email);
+        if (user is null)
+            Unauthorized();
+
+        IdentityResult result = await _authPlatform.ConfirmEmailAsync(user, confirmMailDto.Token);
+        if (result.Succeeded)
+            await _userManager.AddToRoleAsync(user, Roles.User);
+
+        return result.Succeeded ? Ok() : Unauthorized();
     }
 
 

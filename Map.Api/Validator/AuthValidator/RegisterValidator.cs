@@ -2,6 +2,7 @@
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
+using Map.Platform;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
@@ -16,6 +17,8 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
 
     public RegisterValidator(UserManager<MapUser> userManager)
     {
+        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+
         RuleFor(dto => dto)
             .NotEmpty()
             .WithErrorCode(nameof(EAuthErrorCodes.DtoNotNull))
@@ -80,7 +83,6 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
             && !string.IsNullOrWhiteSpace(dto.ConfirmPassword))
             .WithErrorCode(nameof(EMapUserErrorCodes.ConfirmPasswordMustEqualPassword))
             .WithMessage("Confirm password field must be equal than password field");
-        _userManager = userManager;
 
         #endregion
 
