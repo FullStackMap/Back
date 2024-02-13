@@ -2,6 +2,7 @@
 
 public class TemplatesName
 {
-    public static string AccountCreatedMail => "toto.html";
+    public static string AccountCreatedMail => "AccountCreatedMail.html";
+    public static string ForgotPasswordMail => "ForgotPasswordMail.html";
 
 }
