@@ -2,10 +2,12 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
+using Map.API.MailTemplate;
 using Map.API.Models.TripDto;
 using Map.API.Validator.TripValidator;
 using Map.Domain.Entities;
 using Map.Domain.Models.AuthDto;
+using Map.Domain.Models.EmailDto;
 using Map.Domain.Models.TripDto;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -25,24 +27,31 @@ public class AuthController : ControllerBase
     private readonly IValidator<RegisterDto> _registerValidator;
     private readonly IValidator<ConfirmMailDto> _confirmMailValidator;
     private readonly IAuthPlatform _authPlatform;
+    private readonly IMailPlatform _mailPlatform;
     private readonly IMapper _mapper;
 
     #endregion
 
     #region Ctor
-    public AuthController(UserManager<MapUser> userManager, IValidator<RegisterDto> registerValidator, IMapper mapper, IAuthPlatform authPlatform, IValidator<ConfirmMailDto> confirmMailValidator)
+    public AuthController(UserManager<MapUser> userManager,
+                          IValidator<RegisterDto> registerValidator,
+                          IMapper mapper,
+                          IAuthPlatform authPlatform,
+                          IValidator<ConfirmMailDto> confirmMailValidator,
+                          IMailPlatform mailPlatform)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _registerValidator = registerValidator ?? throw new ArgumentNullException(nameof(registerValidator));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(registerValidator));
         _authPlatform = authPlatform ?? throw new ArgumentNullException(nameof(authPlatform));
         _confirmMailValidator = confirmMailValidator ?? throw new ArgumentNullException(nameof(confirmMailValidator));
+        _mailPlatform = mailPlatform ?? throw new ArgumentNullException(nameof(mailPlatform));
     }
 
     #endregion
 
     /// <summary>
-    /// Register new ser
+    /// Register new user
     /// </summary>
     /// <param name="registerDto"></param>
     /// <returns></returns>
@@ -68,24 +77,20 @@ public class AuthController : ControllerBase
 
         string confirmationLink = await _authPlatform.GenerateEmailConfirmationLinkAsync(user);
 
-        //TODO : Add envois de mail
-        //string emailTemplateText = _emailProvider.GetTemplate(TemplatePath.Register.ToString());
-        //if (emailTemplateText is null)
-        //    throw new FileNotFoundException(TemplateMessage.TemplateRegisterNotFound.ToString());
+        string emailTemplateText = _mailPlatform.GetTemplate(TemplatesName.AccountCreatedMail);
 
-        //emailTemplateText = emailTemplateText.Replace("[username]", user.UserName);
-        //emailTemplateText = emailTemplateText.Replace("[email]", user.Email);
-        //emailTemplateText = emailTemplateText.Replace("[ConfirmationLink]", confirmationLink);
+        emailTemplateText = emailTemplateText.Replace("[username]", user.UserName);
+        emailTemplateText = emailTemplateText.Replace("[ConfirmationLink]", confirmationLink);
 
-        //MailDTO mailDTO = new()
-        //{
-        //    Name = user.UserName,
-        //    Email = user.Email,
-        //    Subject = "Bienvenue sur GameTrip",
-        //    Body = emailTemplateText
-        //};
+        MailDto mailDto = new()
+        {
+            Name = user.UserName,
+            Email = user.Email,
+            Subject = "Bienvenue sur XXX",
+            Body = emailTemplateText
+        };
 
-        //await _mailPlatform.SendMailAsync(mailDTO);
+        await _mailPlatform.SendMailAsync(mailDto);
 
         return Created();
     }
