@@ -113,6 +113,7 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region AuthValidator
+        services.AddScoped<IValidator<LoginDto>, LoginValidator>();
         services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
         services.AddScoped<IValidator<ConfirmMailDto>, ConfirmMailValidator>();
         services.AddScoped<IValidator<ForgotPasswordDto>, ForgotPasswordValidator>();
