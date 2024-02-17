@@ -11,4 +11,5 @@ public enum EMapUserErrorCodes
     ConfirmPasswordMustEqualPassword = 008,
     UsernameNotUnique = 009,
     EmailNotUnique = 010,
+    UserNotFoundByEmail = 011,
 }

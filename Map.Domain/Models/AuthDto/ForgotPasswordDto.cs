@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Map.Domain.ErrorCodes;
-
-public enum EAuthErrorCodes
+namespace Map.Domain.Models.AuthDto;
+public class ForgotPasswordDto
 {
-    DtoNotNull = 201,
-    TokenNotEmpty = 202,
+    public string Email { get; set; }
 }
