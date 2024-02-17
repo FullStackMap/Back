@@ -4,6 +4,8 @@ public interface IUnitOfWork : IDisposable
 {
     #region Properties
 
+    ITripRepository Trip { get; }
+
     #endregion Properties
 
     #region Methods

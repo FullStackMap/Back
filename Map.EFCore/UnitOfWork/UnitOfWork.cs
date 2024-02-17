@@ -1,4 +1,5 @@
 ﻿using Map.EFCore.Interfaces;
+using Map.EFCore.Repositories;
 
 namespace Map.EFCore.UnitOfWork;
 
@@ -7,8 +8,8 @@ public class UnitOfWork : IUnitOfWork
     #region Properties
 
     private readonly MapContext _context;
-    //public IKeyRepository Keys { get; private set; }
-    //public ITranslationRepository Translations { get; private set; }
+
+    public ITripRepository Trip { get; }
 
     #endregion Properties
 
@@ -17,8 +18,7 @@ public class UnitOfWork : IUnitOfWork
     public UnitOfWork(MapContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        //Keys = keys ?? throw new ArgumentNullException(nameof(keys));
-        //Translations = translations ?? throw new ArgumentNullException(nameof(translations));
+        Trip = new TripRepository(_context);
     }
 
     #endregion Constructor

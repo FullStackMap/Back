@@ -49,7 +49,6 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             u.Property(u => u.NormalizedUserName).IsRequired();
             u.Property(u => u.Email).IsRequired();
             u.Property(u => u.NormalizedEmail).IsRequired();
-            u.Property(u => u.PhoneNumber).IsRequired();
 
             u.HasMany(u => u.Trips)
                 .WithOne(t => t.User)

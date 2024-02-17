@@ -1,8 +1,22 @@
-﻿using Map.EFCore.Extensions;
+﻿using Asp.Versioning;
+using FluentValidation;
+using Map.API.AutoMapperProfies;
+using Map.API.Configuration;
+using Map.API.Models.TripDto;
+using Map.API.Validator.AuthValidator;
+using Map.API.Validator.TripValidator;
+using Map.Domain.Entities;
+using Map.Domain.Models.AuthDto;
+using Map.Domain.Models.TripDto;
+using Map.Domain.Settings;
+using Map.EFCore;
+using Map.EFCore.Extensions;
 using Map.Platform.Extensions;
 using Map.Provider.Extensions;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Security.Claims;
 
 namespace Map.API.Extension;
 
@@ -15,19 +29,8 @@ public static class ServiceCollectionExtensions
     public static void ConfigureSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
-        {
-            string? API_NAME = Assembly.GetExecutingAssembly().GetName().Name;
-            string xmlPath = $"{AppContext.BaseDirectory}{API_NAME}.xml";
-
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = API_NAME,
-                Description = "MAP API",
-            });
-            c.IncludeXmlComments(xmlPath);
-        });
+        services.AddSingleton<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerGenOptions>();
+        services.AddSwaggerGen(options => options.OperationFilter<SwaggerDefaultValues>());
     }
 
     /// <summary>
@@ -55,10 +58,8 @@ public static class ServiceCollectionExtensions
     /// Adds the auto mapper configuration.
     /// </summary>
     /// <param name="services">The services.</param>
-    public static void AddAutoMapperConfiguration(this IServiceCollection services)
-    {
-
-    }
+    public static void AddAutoMapperConfiguration(this IServiceCollection services) => services.AddAutoMapper(typeof(TripProfiles))
+                                                                                               .AddAutoMapper(typeof(UserProfiles));
 
 
     /// <summary>
@@ -68,12 +69,33 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration">The configuration.</param>
     public static void AddServices(this IServiceCollection services, ConfigurationManager configuration)
     {
-        services.AddPlatforms()
+        services.AddSettings(configuration)
+            .AddPlatforms()
             .AddProviders()
             .AddValidators()
-            .AddRepositories();
+            .AddRepositories()
+            .AddDBInitializer()
+            .AddIdentity();
 
         services.AddControllers();
+    }
+    
+    /// <summary>
+    /// Add settings as services
+    /// </summary>
+    /// <param name="services">The Services</param>
+    public static IServiceCollection AddSettings(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        JWTSettings JWTSettings = configuration.GetSection("JWTSettings").Get<JWTSettings>() ?? throw new ArgumentNullException(nameof(JWTSettings));
+        services.AddSingleton(JWTSettings);
+
+        MailSettings mailSettings = configuration.GetSection("MailSettings").Get<MailSettings>() ?? throw new ArgumentNullException(nameof(mailSettings));
+        services.AddSingleton(mailSettings);
+
+        RegisterSettings registerSettings = configuration.GetSection("RegisterSettings").Get<RegisterSettings>() ?? throw new ArgumentNullException(nameof(registerSettings));
+        services.AddSingleton(registerSettings);
+
+        return services;
     }
 
     /// <summary>
@@ -81,9 +103,81 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The services.</param>
     /// <returns>An IServiceCollection.</returns>
-    public static IServiceCollection AddValidators(this IServiceCollection services)
+    private static IServiceCollection AddValidators(this IServiceCollection services)
     {
+        #region TripValidator
 
+        services.AddScoped<IValidator<AddTripDto>, AddTripValidator>();
+        services.AddScoped<IValidator<UpdateTripDto>, UpdateTripValidator>();
+
+        #endregion
+
+        #region AuthValidator
+        services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
+        #endregion
         return services;
+    }
+
+    private static IServiceCollection AddIdentity(this IServiceCollection services)
+    {
+        services.AddIdentity<MapUser, IdentityRole<Guid>>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+
+            options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+            options.ClaimsIdentity.UserIdClaimType = "Id";
+            options.ClaimsIdentity.UserNameClaimType = "UserName";
+            options.ClaimsIdentity.EmailClaimType = ClaimTypes.Email;
+
+            //Password requirement
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequiredUniqueChars = 4; //Determine le nombre de caractère unnique minimum requis
+
+            //Lockout si mdp fail 5 fois alors compte bloquer 60 min
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(60);
+            options.Lockout.AllowedForNewUsers = true;
+
+            //User
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            options.User.RequireUniqueEmail = true;
+
+            //Sign
+            options.SignIn.RequireConfirmedAccount = true;
+        })
+        .AddDefaultTokenProviders()
+        .AddRoles<IdentityRole<Guid>>()
+        .AddEntityFrameworkStores<MapContext>();
+
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+        });
+        return services;
+    }
+
+    public static void ConfigureApiVersionning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        }).AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = $"'v'VVV";
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.SubstituteApiVersionInUrl = true;
+            options.SubstitutionFormat = "VVV";
+        });
     }
 }

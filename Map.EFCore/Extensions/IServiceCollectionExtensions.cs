@@ -8,8 +8,16 @@ public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped(typeof(ITripRepository), typeof(TripRepository));
+
+        return services;
+    }
+
+    public static IServiceCollection AddDBInitializer(this IServiceCollection services)
+    {
+        services.AddScoped<DBInitializer>();
 
         return services;
     }

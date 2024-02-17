@@ -11,6 +11,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Models\MapUserDto\**" />
+	  <Content Remove="Models\MapUserDto\**" />
+	  <EmbeddedResource Remove="Models\MapUserDto\**" />
+	  <None Remove="Models\MapUserDto\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Asp.Versioning.Http" Version="8.0.0" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="FluentValidation" Version="11.9.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.1" />
@@ -21,6 +30,8 @@
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,9 +41,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="AutoMapperProfies\" />
-		<Folder Include="Dto\" />
-		<Folder Include="Validator\" />
 		<Folder Include="wwwroot\swagger\v1\" />
 	</ItemGroup>
 
