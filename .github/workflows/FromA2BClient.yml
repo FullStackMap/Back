@@ -24,7 +24,7 @@ jobs:
         with:
           dotnet-version: '8.x.x'
 
-      - name: Restore Tools
+      - name: Restore packages
         run: dotnet tool restore
 
       - name: Create .Net Manifest
@@ -45,22 +45,22 @@ jobs:
         uses: microsoft/variable-substitution@v1
         if: github.ref_name == 'develop'
         with:
-          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+          files: './Map.API/appsettings.json'
         env:
-          ConnectionStrings.GameTripSQL: ${{secrets.GAMETRIPSQL_STAGING}}
+          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2BSQL_DEPLOY}}
 
       - name: App Settings Variable Substitution Production
         uses: microsoft/variable-substitution@v1
         if: github.ref_name == 'master'
         with:
-          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+          files: './Map.API/appsettings.json'
         env:
-          ConnectionStrings.GameTripSQL: ${{secrets.GAMETRIPSQL}}
+          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2BSQL_STAGING}}
 
       - name: App Settings Variable Substitution Global
         uses: microsoft/variable-substitution@v1
         with:
-          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+          files: './Map.API/appsettings.json'
         env:
           JWTSettings.Secret: ${{secrets.JWT_KEY}}
           MailSettings.Server: ${{secrets.MAIL_SERVER}}
@@ -71,34 +71,19 @@ jobs:
       - name: .Net Build
         uses: EasyDesk/action-dotnet-build@v1.0.0
         with:
-          path: ./GameTrip/GameTrip.API/
+          path: ./Map.API/
 
       - name: Generate Swagger.json
-        run: dotnet swagger tofile --output ./swagger.json ./GameTrip/GameTrip.API/bin/Release/net7.0/GameTrip.API.dll v1
+        run: dotnet swagger tofile --output ./swagger.json ./Map.API/bin/Release/net7.0/Map.API.dll v1
 
       - name: Get Variable value
         run: echo "NPM_PACKAGE_VERSION=$(node -p "require('./npmVersion.json').version")" >> $GITHUB_ENV
 
       - name: Create API Client
-        run: openapi-generator-cli generate -i ./swagger.json -g typescript -o ./gametrip-api-client/ --additional-properties=npmName=@game-trip/ts-api-client --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
+        run: openapi-generator-cli generate -i ./swagger.json -g typescript-axios -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
 
-      - name: Add File To Packagejson
+      - name: Add Files To Packagejson
         uses: restackio/update-json-file-action@v2.0
         with:
-          file: ./gametrip-api-client/package.json
+          file: ./FromA2B_Api_Client/package.json
           fields: '{"files": ["dist"]}'
-
-      - name: count nb change in api-client repo
-        run: echo "nbChange=$(git diff --name-status | grep "^[MARD]" | wc -l)" >> $GITHUB_OUTPUT
-        id: countChange
-        working-directory: ./gametrip-api-client
-
-      - name: Push to Gametrip-api-client if have modification
-        if: ${{ steps.countChange.outputs.nbChange != 0}}
-        working-directory: ./gametrip-api-client
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add -A
-          git commit -m "Update GameTrip Client V${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }}"
-          git push origin HEAD:${{ github.ref_name }}
