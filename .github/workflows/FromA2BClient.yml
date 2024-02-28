@@ -34,11 +34,25 @@ jobs:
       - name: Create API Client
         run: openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json -g typescript-axios -c ./generatorConfig.json -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
 
-      - name: List Files
-        run: ls -R
-
       - name: Add Files To Packagejson
         uses: restackio/update-json-file-action@v2.0
         with:
           file: ./FromA2B_Api_Client/package.json
           fields: '{"files": ["dist"]}'
+
+      - name: Set NPM Token
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
+
+      - name: Install npm package
+        run: npm install
+
+      - name: Build client API
+        run: npm run build
+
+      - name: Get Variable value
+        run: |
+          echo "NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")" >> $GITHUB_ENV
+
+      - name: Create NPM publish
+        run: npm publish
