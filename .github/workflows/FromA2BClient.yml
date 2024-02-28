@@ -38,7 +38,7 @@ jobs:
         uses: restackio/update-json-file-action@v2.0
         with:
           file: ./FromA2B_Api_Client/package.json
-          fields: '{"files": ["dist"]}'
+          fields: '{"files": ["dist/"]}'
 
       # make task to cat this file ./FromA2B_Api_Client/package.json
       - name: cat file
