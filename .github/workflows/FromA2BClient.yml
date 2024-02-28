@@ -20,9 +20,6 @@ jobs:
         # if: github.ref_name == 'develop'
         run: echo "npmTag=-Beta" >> $GITHUB_ENV
 
-      - name: List Files
-        run: ls -R
-
       - name: Install Node LTS
         uses: actions/setup-node@v3
         with:
@@ -36,6 +33,9 @@ jobs:
 
       - name: Create API Client
         run: openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json -g typescript-axios -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
+
+      - name: List Files
+        run: ls -R
 
       - name: Add Files To Packagejson
         uses: restackio/update-json-file-action@v2.0
