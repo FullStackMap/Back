@@ -25,6 +25,9 @@ jobs:
         with:
           node-version: lts/*
 
+      - name: install Open Api Tool CLI
+        run: npm install @openapitools/openapi-generator-cli -g
+
       - name: Get Variable value
         run: echo "NPM_PACKAGE_VERSION=$(node -p "require('./npmVersion.json').version")" >> $GITHUB_ENV
 
