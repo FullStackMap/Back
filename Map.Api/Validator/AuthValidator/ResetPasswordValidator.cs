@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Map.API.Extension;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
@@ -16,17 +17,17 @@ public class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
         RuleFor(dto => dto)
             .NotNull()
             .NotEmpty()
-            .WithErrorCode(nameof(EAuthErrorCodes.DtoNotNull))
+            .WithErrorCode(EAuthErrorCodes.DtoNotNull.ToStringValue())
             .WithMessage("Dto is required");
 
         #region Email
         RuleFor(dto => dto.Email)
             .NotNull()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotEmpty.ToStringValue())
             .WithMessage("Email is required")
             //Check if mail is valid
             .EmailAddress()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotValid))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotValid.ToStringValue())
             .WithMessage("Email is not valid")
             //check if the user exist by mail
             .MustAsync(async (dto, email, cancellationToken) =>
@@ -34,7 +35,7 @@ public class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
                 MapUser? user = await _userManager.FindByEmailAsync(email.ToString());
                 return user is not null;
             })
-            .WithErrorCode(nameof(EMapUserErrorCodes.UserNotFoundByEmail))
+            .WithErrorCode(EMapUserErrorCodes.UserNotFoundByEmail.ToStringValue())
             .WithMessage("User not found by mail");
         #endregion
 
@@ -42,7 +43,7 @@ public class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
         RuleFor(dto => dto.Password)
             //check if password is not null
             .NotNull()
-            .WithErrorCode(nameof(EMapUserErrorCodes.PasswordNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.PasswordNotEmpty.ToStringValue())
             .WithMessage("Password is required");
 
         #endregion
@@ -59,7 +60,7 @@ public class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
                            && dto.PasswordConfirmation is null
                            && !string.IsNullOrWhiteSpace(dto.Password)
                            && !string.IsNullOrWhiteSpace(dto.PasswordConfirmation))
-            .WithErrorCode(nameof(EMapUserErrorCodes.ConfirmPasswordMustEqualPassword))
+            .WithErrorCode(EMapUserErrorCodes.ConfirmPasswordMustEqualPassword.ToStringValue())
             .WithMessage("Confirm password must be equal than password");
         #endregion
 
@@ -69,7 +70,7 @@ public class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
             .NotNull()
             .NotEmpty()
             .Unless(dto => dto is null)
-            .WithErrorCode(nameof(EAuthErrorCodes.TokenNotEmpty))
+            .WithErrorCode(EAuthErrorCodes.TokenNotEmpty.ToStringValue())
             .WithMessage("Token is required");
 
         #endregion

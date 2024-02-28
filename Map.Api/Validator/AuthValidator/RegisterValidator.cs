@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
+using Map.API.Extension;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
-using Map.Platform;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
@@ -21,14 +21,14 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
 
         RuleFor(dto => dto)
             .NotEmpty()
-            .WithErrorCode(nameof(EAuthErrorCodes.DtoNotNull))
+            .WithErrorCode(EAuthErrorCodes.DtoNotNull.ToStringValue())
             .WithMessage("The dto is required");
 
         #region Username
         RuleFor(dto => dto.Username)
             //check if the username is not empty
             .NotEmpty()
-            .WithErrorCode(nameof(EMapUserErrorCodes.UserNameNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.UserNameNotEmpty.ToStringValue())
             .WithMessage("Username is required")
             //check if the username is unique
             .MustAsync(async (dto, username, cancellationToken) =>
@@ -36,7 +36,7 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
                 MapUser? user = await _userManager.FindByNameAsync(username.ToString());
                 return user is null;
             })
-            .WithErrorCode(nameof(EMapUserErrorCodes.UsernameNotUnique))
+            .WithErrorCode(EMapUserErrorCodes.UsernameNotUnique.ToStringValue())
             .WithMessage("Username muste be unique");
 
         #endregion
@@ -45,11 +45,11 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
         RuleFor(dto => dto.Email)
             //Check if the email is not empty
             .NotEmpty()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotEmpty.ToStringValue())
             .WithMessage("Email is required")
             //Check that the password is in this format xx@xx.xx
             .EmailAddress()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotValid))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotValid.ToStringValue())
             .WithMessage("Email field must be an Email")
             //check if the email is unique
             .MustAsync(async (dto, email, cancellationToken) =>
@@ -57,14 +57,14 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
                 MapUser? user = await _userManager.FindByEmailAsync(email.ToString());
                 return user is null;
             })
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotUnique))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotUnique.ToStringValue())
             .WithMessage("Email muste be unique");
         #endregion
 
         #region Password
         RuleFor(dto => dto.Password)
             .NotEmpty()
-            .WithErrorCode(nameof(EMapUserErrorCodes.PasswordNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.PasswordNotEmpty.ToStringValue())
             .WithMessage("Password is required");
 
         #endregion
@@ -73,7 +73,7 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
         RuleFor(dto => dto.ConfirmPassword)
             //Check is the ConfirmPassword is not required
             .NotEmpty()
-           .WithErrorCode(nameof(EMapUserErrorCodes.ConfirmPasswordNotEmpty))
+           .WithErrorCode(EMapUserErrorCodes.ConfirmPasswordNotEmpty.ToStringValue())
            .WithMessage("ConfirmPassword is required")
             //Check if ConfirmPassword is Equal thant password
             .Equal(dto => dto.Password)
@@ -81,7 +81,7 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
             && dto.ConfirmPassword is null
             && !string.IsNullOrWhiteSpace(dto.Password)
             && !string.IsNullOrWhiteSpace(dto.ConfirmPassword))
-            .WithErrorCode(nameof(EMapUserErrorCodes.ConfirmPasswordMustEqualPassword))
+            .WithErrorCode(EMapUserErrorCodes.ConfirmPasswordMustEqualPassword.ToStringValue())
             .WithMessage("Confirm password field must be equal than password field");
 
         #endregion

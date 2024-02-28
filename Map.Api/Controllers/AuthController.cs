@@ -4,17 +4,14 @@ using FluentValidation;
 using FluentValidation.Results;
 using Map.API.MailTemplate;
 using Map.API.Models.TripDto;
-using Map.API.Validator.AuthValidator;
 using Map.Domain.Entities;
 using Map.Domain.Models.AuthDto;
 using Map.Domain.Models.EmailDto;
 using Map.Platform.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
@@ -69,9 +66,9 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Route("Login")]
     [MapToApiVersion(ApiControllerVersions.V1)]
-    //[ProducesResponseType(typeof(TripDto), StatusCodes.Status201Created)]
-    //[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-    //[ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(TripDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TokenDto>> Login([FromBody] LoginDto loginDto)
     {
         ValidationResult validationResult = _loginValidator.Validate(loginDto);
@@ -87,7 +84,7 @@ public class AuthController : ControllerBase
         {
             JwtSecurityTokenHandler tokenHandler = new();
             SecurityToken token = await _authPlatform.CreateTokenAsync(user);
-            return new TokenDto(tokenHandler.WriteToken(token), token.ValidTo);
+            return new TokenDto(tokenHandler.WriteToken(token));
         }
         else
             return Unauthorized();

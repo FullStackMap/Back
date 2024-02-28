@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Map.API.Extension;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
@@ -16,18 +17,18 @@ public class ForgotPasswordValidator : AbstractValidator<ForgotPasswordDto>
         RuleFor(dto => dto)
             .NotNull()
             .NotEmpty()
-            .WithErrorCode(nameof(EAuthErrorCodes.DtoNotNull))
+            .WithErrorCode(EAuthErrorCodes.DtoNotNull.ToStringValue())
             .WithMessage("Dto is required");
 
         #region Email
         RuleFor(dto => dto.Email)
             .NotNull()
             .NotEmpty()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotEmpty.ToStringValue())
             .WithMessage("Email is required")
             //Check if email is valid than xx@xx.xx
             .EmailAddress()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotValid))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotValid.ToStringValue())
             .WithMessage("Email not valid")
             //check if the user exist by mail
             .MustAsync(async (dto, email, cancellationToken) =>
@@ -35,9 +36,9 @@ public class ForgotPasswordValidator : AbstractValidator<ForgotPasswordDto>
                 MapUser? user = await _userManager.FindByEmailAsync(email.ToString());
                 return user is not null;
             })
-            .WithErrorCode(nameof(EMapUserErrorCodes.UserNotFoundByEmail))
+            .WithErrorCode(EMapUserErrorCodes.UserNotFoundByEmail.ToStringValue())
             .WithMessage("User not found by mail");
-        
+
         #endregion
     }
 }

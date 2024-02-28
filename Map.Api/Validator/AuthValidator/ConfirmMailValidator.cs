@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
+using Map.API.Extension;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
-using Map.Platform;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
@@ -17,24 +17,23 @@ public class ConfirmMailValidator : AbstractValidator<ConfirmMailDto>
 
     public ConfirmMailValidator(UserManager<MapUser> userManager)
     {
-
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 
         RuleFor(dto => dto)
             //Dto is required
             .NotEmpty()
-            .WithErrorCode(nameof(EAuthErrorCodes.DtoNotNull))
+            .WithErrorCode(EAuthErrorCodes.DtoNotNull.ToStringValue())
             .WithMessage("Dto is required");
 
         #region Email
         RuleFor(dto => dto.Email)
             //Check if mail is not empty
             .NotEmpty()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotEmpty.ToStringValue())
             .WithMessage("Email is required")
             //Check if mail is typeof MAIL
             .EmailAddress()
-            .WithErrorCode(nameof(EMapUserErrorCodes.EmailNotValid))
+            .WithErrorCode(EMapUserErrorCodes.EmailNotValid.ToStringValue())
             .WithMessage("The mail muste be an valid email")
             //check if the user exist by mail
             .MustAsync(async (dto, email, cancellationToken) =>
@@ -42,14 +41,14 @@ public class ConfirmMailValidator : AbstractValidator<ConfirmMailDto>
                 MapUser? user = await _userManager.FindByEmailAsync(email.ToString());
                 return user is not null;
             })
-            .WithErrorCode(nameof(EMapUserErrorCodes.UserNotFoundByEmail))
+            .WithErrorCode(EMapUserErrorCodes.UserNotFoundByEmail.ToStringValue())
             .WithMessage("User not found by mail"); ;
         #endregion
 
         #region Token
         RuleFor(dto => dto.Token)
             .NotEmpty()
-            .WithErrorCode(nameof(EAuthErrorCodes.TokenNotEmpty))
+            .WithErrorCode(EAuthErrorCodes.TokenNotEmpty.ToStringValue())
             .WithMessage("Token is required");
         #endregion
     }

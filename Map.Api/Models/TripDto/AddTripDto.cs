@@ -28,5 +28,5 @@ public class AddTripDto
     /// <summary>
     /// End date of the trip.
     /// </summary>
-    public DateOnly EndDate { get; set; }
+    public DateOnly? EndDate { get; set; }
 }

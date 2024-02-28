@@ -19,7 +19,7 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
         //Check if the dto is null
         RuleFor(dto => dto)
             .NotEmpty()
-            .WithErrorCode(nameof(ETripErrorCodes.TripDtoNull))
+            .WithErrorCode(ETripErrorCodes.TripDtoNull.ToString())
             .WithMessage("Trip Dto canno't be null");
 
         #endregion
@@ -29,15 +29,15 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
         //Check if the UserId is not empty
         RuleFor(trip => trip.UserId)
             .NotEmpty()
-            .WithErrorCode(nameof(EMapUserErrorCodes.UserIdNotNull))
+            .WithErrorCode(EMapUserErrorCodes.UserIdNotNull.ToString())
             .WithMessage("UserId is required")
         //Check if the user exists with userManager of entity framework
         .MustAsync(async (trip, userId, cancellationToken) =>
         {
             MapUser? user = await userManager.FindByIdAsync(userId.ToString());
-            return user is not null; 
+            return user is not null;
         })
-        .WithErrorCode(nameof(EMapUserErrorCodes.UserNotFoundById))
+        .WithErrorCode(EMapUserErrorCodes.UserNotFoundById.ToString())
         .WithMessage("User not found");
 
         #endregion
@@ -47,15 +47,15 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
         RuleFor(trip => trip.Name)
             //Check if the name is not empty
             .NotEmpty()
-            .WithErrorCode(nameof(ETripErrorCodes.TripNameNotNull))
+            .WithErrorCode(ETripErrorCodes.TripNameNotNull.ToString())
             .WithMessage("Trip Name is required")
             //Check if the name is not longer than 50 characters
             .MaximumLength(50)
-            .WithErrorCode(nameof(ETripErrorCodes.TripNameMaxLength))
+            .WithErrorCode(ETripErrorCodes.TripNameMaxLength.ToString())
             .WithMessage("Name cannot be longer than 50 characters")
             //Check if the name is not shorter than 3 characters
             .MinimumLength(3)
-            .WithErrorCode(nameof(ETripErrorCodes.TripNameMinLength))
+            .WithErrorCode(ETripErrorCodes.TripNameMinLength.ToString())
             .WithMessage("Name cannot be shorter than 3 characters")
             //Check if the name is unique in trip list of the user
             .MustAsync(async (dto, name, cancellationToken) =>
@@ -63,7 +63,7 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
                 List<Trip>? tripList = await tripPlatform.GetTripListByUserIdAsync(dto.UserId);
                 return tripList.All(trip => trip.Name.ToUpper() != name.ToUpper());
             })
-            .WithErrorCode(nameof(ETripErrorCodes.TripNameUniqueByUser))
+            .WithErrorCode(ETripErrorCodes.TripNameUniqueByUser.ToString())
             .WithMessage((trip) => $"The account with id: {trip.UserId}. Allready has a trip with name : {trip.Name}");
 
 
@@ -74,7 +74,7 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
         //Check if the description is not longer than 500 characters
         RuleFor(trip => trip.Description)
             .MaximumLength(500)
-            .WithErrorCode(nameof(ETripErrorCodes.TripDescriptionMaxLength))
+            .WithErrorCode(ETripErrorCodes.TripDescriptionMaxLength.ToString())
             .WithMessage("Description cannot be longer than 500 characters");
 
         #endregion
@@ -84,11 +84,11 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
         RuleFor(trip => trip.StartDate)
             //Check if the start date is not empty
             .NotEmpty()
-            .WithErrorCode(nameof(ETripErrorCodes.TripStartDateNotNull))
+            .WithErrorCode(ETripErrorCodes.TripStartDateNotNull.ToString())
             .WithMessage("StartDate is required")
             //Check the date type
             .Must(startDate => startDate is DateOnly)
-            .WithErrorCode(nameof(ETripErrorCodes.TripStartDateNotDateOnly))
+            .WithErrorCode(ETripErrorCodes.TripStartDateNotDateOnly.ToString())
             .WithMessage("StartDate must be of type DateOnly")
             //Check if the start date is not in the past
             .Must(startDate =>
@@ -96,7 +96,7 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
                 DateOnly today = DateOnly.FromDateTime(DateTime.Now);
                 return startDate >= today;
             })
-            .WithErrorCode(nameof(ETripErrorCodes.TripStartDateNotInPast))
+            .WithErrorCode(ETripErrorCodes.TripStartDateNotInPast.ToString())
             .WithMessage("StartDate cannot be in the past");
 
         #endregion
@@ -104,13 +104,10 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
         #region EndDate
 
         RuleFor(trip => trip.EndDate)
-            //Check if the end date is not empty
-            .NotEmpty()
-            .WithErrorCode(nameof(ETripErrorCodes.TripEndDateNotNull))
-            .WithMessage("EndDate is required")
             //Check the end date type
             .Must(endDate => endDate is DateOnly)
-            .WithErrorCode(nameof(ETripErrorCodes.TripEndDateNotDateOnly))
+            .Unless(trip => trip.EndDate is null)
+            .WithErrorCode(ETripErrorCodes.TripEndDateNotDateOnly.ToString())
             .WithMessage("EndDate must be of type DateOnly")
             //Check if the end date is not in the past
             .Must(endDate =>
@@ -118,11 +115,13 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
                 DateOnly today = DateOnly.FromDateTime(DateTime.Now);
                 return endDate >= today;
             })
-            .WithErrorCode(nameof(ETripErrorCodes.TripEndDateNotInPast))
+            .Unless(trip => trip.EndDate is null)
+            .WithErrorCode(ETripErrorCodes.TripEndDateNotInPast.ToString())
             .WithMessage("EndDate cannot be in the past")
             //Check if the end date is after the start date
             .Must((trip, endDate) => endDate >= trip.StartDate)
-            .WithErrorCode(nameof(ETripErrorCodes.TripEndDateNotBeforStartDate))
+            .Unless(trip => trip.EndDate is null)
+            .WithErrorCode(ETripErrorCodes.TripEndDateNotBeforStartDate.ToString())
             .WithMessage("EndDate cannot be before StartDate");
 
         #endregion

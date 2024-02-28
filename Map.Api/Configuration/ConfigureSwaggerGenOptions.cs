@@ -31,6 +31,7 @@ public class ConfigureSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
         string xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
+        options.CustomOperationIds(apiDescription => apiDescription.TryGetMethodInfo(out MethodInfo methodInfo) ? $"{methodInfo.Name}{apiDescription.HttpMethod}" : null);
         options.AddSecurityDefinition(CdmOpenApiSecuritySchemes.CdmBearerId, CdmOpenApiSecuritySchemes.CdmBearer);
     }
 }
@@ -40,7 +41,7 @@ internal static class CdmOpenApiSecuritySchemes
     /// <summary>
     /// The cdm bearer id.
     /// </summary>
-    public const string CdmBearerId = "AuthApi/Auth0 JWT Bearer";
+    public const string CdmBearerId = "Bearer";
 
     public static readonly OpenApiSecurityScheme CdmBearer = new()
     {
