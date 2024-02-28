@@ -40,6 +40,10 @@ jobs:
           file: ./FromA2B_Api_Client/package.json
           fields: '{"files": ["dist"]}'
 
+      # make task to cat this file ./FromA2B_Api_Client/package.json
+      - name: cat file
+        run: cat ./FromA2B_Api_Client/package.json
+
       - name: Set NPM Token
         working-directory: ./FromA2B_Api_Client
         run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
