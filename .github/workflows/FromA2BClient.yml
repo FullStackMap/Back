@@ -1,0 +1,104 @@
+name: Create FromA2B Api Client
+
+on:
+  push:
+    branches: [master, develop, features/*]
+
+env:
+  npmTag: ''
+
+jobs:
+  ApiClient:
+    name: Build And Create Api Client
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup npmTag to -Beta
+        if: github.ref_name == 'develop'
+        run: echo "npmTag=-Beta" >> $GITHUB_ENV
+
+      - name: Install .Net 8
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x.x'
+
+      - name: Restore Tools
+        run: dotnet tool restore
+
+      - name: Create .Net Manifest
+        run: dotnet new tool-manifest
+
+      - name: Install Nuget Package
+        run: dotnet tool install Swashbuckle.AspNetCore.Cli
+
+      - name: Install Node LTS
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+
+      - name: install Open Api Tool CLI
+        run: npm install @openapitools/openapi-generator-cli -g
+
+      - name: App Settings Variable Substitution Staging
+        uses: microsoft/variable-substitution@v1
+        if: github.ref_name == 'develop'
+        with:
+          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+        env:
+          ConnectionStrings.GameTripSQL: ${{secrets.GAMETRIPSQL_STAGING}}
+
+      - name: App Settings Variable Substitution Production
+        uses: microsoft/variable-substitution@v1
+        if: github.ref_name == 'master'
+        with:
+          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+        env:
+          ConnectionStrings.GameTripSQL: ${{secrets.GAMETRIPSQL}}
+
+      - name: App Settings Variable Substitution Global
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+        env:
+          JWTSettings.Secret: ${{secrets.JWT_KEY}}
+          MailSettings.Server: ${{secrets.MAIL_SERVER}}
+          MailSettings.Port: ${{secrets.MAIL_PORT}}
+          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
+          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
+
+      - name: .Net Build
+        uses: EasyDesk/action-dotnet-build@v1.0.0
+        with:
+          path: ./GameTrip/GameTrip.API/
+
+      - name: Generate Swagger.json
+        run: dotnet swagger tofile --output ./swagger.json ./GameTrip/GameTrip.API/bin/Release/net7.0/GameTrip.API.dll v1
+
+      - name: Get Variable value
+        run: echo "NPM_PACKAGE_VERSION=$(node -p "require('./npmVersion.json').version")" >> $GITHUB_ENV
+
+      - name: Create API Client
+        run: openapi-generator-cli generate -i ./swagger.json -g typescript -o ./gametrip-api-client/ --additional-properties=npmName=@game-trip/ts-api-client --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
+
+      - name: Add File To Packagejson
+        uses: restackio/update-json-file-action@v2.0
+        with:
+          file: ./gametrip-api-client/package.json
+          fields: '{"files": ["dist"]}'
+
+      - name: count nb change in api-client repo
+        run: echo "nbChange=$(git diff --name-status | grep "^[MARD]" | wc -l)" >> $GITHUB_OUTPUT
+        id: countChange
+        working-directory: ./gametrip-api-client
+
+      - name: Push to Gametrip-api-client if have modification
+        if: ${{ steps.countChange.outputs.nbChange != 0}}
+        working-directory: ./gametrip-api-client
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "Update GameTrip Client V${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }}"
+          git push origin HEAD:${{ github.ref_name }}
