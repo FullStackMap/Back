@@ -35,7 +35,7 @@ jobs:
         run: echo "NPM_PACKAGE_VERSION=$(node -p "require('./npmVersion.json').version")" >> $GITHUB_ENV
 
       - name: Create API Client
-        run: openapi-generator-cli generate -i ./Map.API/wwwroot/swagger/swagger.json -g typescript-axios -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
+        run: openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json -g typescript-axios -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
 
       - name: Add Files To Packagejson
         uses: restackio/update-json-file-action@v2.0
