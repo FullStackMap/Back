@@ -40,13 +40,13 @@ jobs:
           file: ./FromA2B_Api_Client/package.json
           fields: '{"files": ["dist/"]}'
 
-      - name: Set NPM Token
+      - name: add .npmignore
         working-directory: ./FromA2B_Api_Client
         run: echo "dist/">.npmignore
 
       # make task to cat this file ./FromA2B_Api_Client/package.json
       - name: cat file
-        run: cat ./FromA2B_Api_Client/package.json
+        run: cat ./FromA2B_Api_Client/.npmignore
 
       - name: Set NPM Token
         working-directory: ./FromA2B_Api_Client
