@@ -20,6 +20,9 @@ jobs:
         # if: github.ref_name == 'develop'
         run: echo "npmTag=-Beta" >> $GITHUB_ENV
 
+      - name: List Files
+        run: ls -R
+
       - name: Install Node LTS
         uses: actions/setup-node@v3
         with:
