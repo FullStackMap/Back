@@ -41,18 +41,23 @@ jobs:
           fields: '{"files": ["dist"]}'
 
       - name: Set NPM Token
+        working-directory: ./FromA2B_Api_Client
         run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
 
       - name: Install npm package
+        working-directory: ./FromA2B_Api_Client
         run: npm install
 
       - name: Build client API
+        working-directory: ./FromA2B_Api_Client
         run: npm run build
 
       - name: Get Variable value
+        working-directory: ./FromA2B_Api_Client
         run: |
           echo "NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
           echo "NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")" >> $GITHUB_ENV
 
       - name: Create NPM publish
+        working-directory: ./FromA2B_Api_Client
         run: npm publish
