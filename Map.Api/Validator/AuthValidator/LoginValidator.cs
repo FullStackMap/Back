@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Map.API.Extension;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
 
@@ -10,13 +11,13 @@ public class LoginValidator : AbstractValidator<LoginDto>
     {
         RuleFor(dto => dto)
             .NotNull()
-            .WithErrorCode(nameof(EAuthErrorCodes.DtoNotNull))
+            .WithErrorCode(EAuthErrorCodes.DtoNotNull.ToStringValue())
             .WithMessage("Dto is required");
 
         #region Username
         RuleFor(dto => dto.Username)
             .NotNull()
-            .WithErrorCode(nameof(EMapUserErrorCodes.UserNameNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.UserNameNotEmpty.ToStringValue())
             .WithMessage("Username is required");
 
         #endregion
@@ -25,7 +26,7 @@ public class LoginValidator : AbstractValidator<LoginDto>
 
         RuleFor(dto => dto.Password)
             .NotNull()
-            .WithErrorCode(nameof(EMapUserErrorCodes.PasswordNotEmpty))
+            .WithErrorCode(EMapUserErrorCodes.PasswordNotEmpty.ToStringValue())
             .WithMessage("Password is required");
 
         #endregion
