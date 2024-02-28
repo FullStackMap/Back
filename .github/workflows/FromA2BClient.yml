@@ -18,69 +18,17 @@ jobs:
       - name: Setup npmTag to -Beta
         if: github.ref_name == 'develop'
         run: echo "npmTag=-Beta" >> $GITHUB_ENV
-
-      - name: Install .Net 8
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.x.x'
-
-      - name: Restore packages
-        run: dotnet tool restore
-
-      - name: Create .Net Manifest
-        run: dotnet new tool-manifest
-
-      - name: Install Nuget Package
-        run: dotnet tool install Swashbuckle.AspNetCore.Cli
-
+        
       - name: Install Node LTS
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
 
-      - name: install Open Api Tool CLI
-        run: npm install @openapitools/openapi-generator-cli -g
-
-      - name: App Settings Variable Substitution Staging
-        uses: microsoft/variable-substitution@v1
-        if: github.ref_name == 'develop'
-        with:
-          files: './Map.API/appsettings.json'
-        env:
-          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2BSQL_DEPLOY}}
-
-      - name: App Settings Variable Substitution Production
-        uses: microsoft/variable-substitution@v1
-        if: github.ref_name == 'master'
-        with:
-          files: './Map.API/appsettings.json'
-        env:
-          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2BSQL_STAGING}}
-
-      - name: App Settings Variable Substitution Global
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: './Map.API/appsettings.json'
-        env:
-          JWTSettings.Secret: ${{secrets.JWT_KEY}}
-          MailSettings.Server: ${{secrets.MAIL_SERVER}}
-          MailSettings.Port: ${{secrets.MAIL_PORT}}
-          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
-          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
-
-      - name: .Net Build
-        uses: EasyDesk/action-dotnet-build@v1.0.0
-        with:
-          path: ./Map.API/
-
-      - name: Generate Swagger.json
-        run: dotnet swagger tofile --output ./swagger.json ./Map.API/bin/Release/net7.0/Map.API.dll v1
-
       - name: Get Variable value
         run: echo "NPM_PACKAGE_VERSION=$(node -p "require('./npmVersion.json').version")" >> $GITHUB_ENV
 
       - name: Create API Client
-        run: openapi-generator-cli generate -i ./swagger.json -g typescript-axios -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
+        run: openapi-generator-cli generate -i ./Map.API/wwwroot/swagger/swagger.json -g typescript-axios -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
 
       - name: Add Files To Packagejson
         uses: restackio/update-json-file-action@v2.0
