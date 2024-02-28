@@ -11,6 +11,6 @@
   "enumPropertyNaming": "original",
   "enumNameSuffix": "",
   "useSingleRequestParameter": false,
-  "npmName": "FromA2B",
+  "npmName": "@FullStackMap/FromA2B",
   "withInterfaces": true
 }
