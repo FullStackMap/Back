@@ -2,7 +2,11 @@ name: Create FromA2B Api Client & Publish NPM Package
 
 on:
   push:
-    branches: [master, develop, features/*]
+    branches:
+      - main
+      - develop
+  release:
+    types: [created]
 
 jobs:
   ApiClient:
@@ -31,31 +35,40 @@ jobs:
           NPM_VERSION=$(echo "$NPM_VERSION" | cut -d '-' -f1)
           echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
-      - name: Setup npmTag and new version
+      - name: Setup npmTag
         id: setup_npm_tag
+        run: |
+          case "${{ github.ref }}" in
+            "refs/heads/develop")
+              echo "::set-output name=NPM_TAG::-Beta"
+              ;;
+            "refs/heads/main")
+              echo "::set-output name=NPM_TAG::-RC"
+              ;;
+          esac
+
+      - name: Setup new version
+        id: setup_new_version
         run: |
           CURRENT_VERSION="${{ steps.get_npm_version.outputs.NPM_VERSION }}"
           MAJOR=$(echo "$CURRENT_VERSION" | cut -d '.' -f1)
           MINOR=$(echo "$CURRENT_VERSION" | cut -d '.' -f2)
           PATCH=$(echo "$CURRENT_VERSION" | cut -d '.' -f3)
           case "${{ github.ref }}" in
-            "refs/heads/main")
-              echo "::set-output name=NPM_TAG::-RC"
-              MAJOR=$((MAJOR + 1))
-              ;;
-            "refs/heads/develop")
-              echo "::set-output name=NPM_TAG::-Beta"
-              MINOR=$((MINOR + 1))
-              ;;
-            refs/heads/features/*)
-              echo "::set-output name=NPM_TAG::-Alpha"
+            refs/tags/fix* )
               PATCH=$((PATCH + 1))
               ;;
+            "refs/heads/develop")
+              MINOR=$((MINOR + 1))
+              ;;
+            "refs/heads/main")
+              MAJOR=$((MAJOR + 1))
+              ;;
           esac
+
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo NEW_VERSION
           echo "::set-output name=NPM_VERSION::$NEW_VERSION"
-          echo ${{ github.ref }}
-          echo ${{ steps.get_npm_version.outputs.NPM_VERSION }}
 
       - name: Cache Node.js modules
         uses: actions/cache@v2
