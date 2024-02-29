@@ -32,13 +32,14 @@ jobs:
             echo "::set-output name=NPM_TAG::-Alpha"
           fi
 
+      - name: Set NPM Token
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
+
       - name: Get NPM version
         id: get_npm_version
         run: |
           NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
           echo "::set-output name=NPM_VERSION::$NPM_VERSION"
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Determine new version
         id: determine_new_version
