@@ -46,7 +46,7 @@ jobs:
 
       - name: Set NPM Token
         working-directory: ./FromA2B_Api_Client
-        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.PAT_TOKEN}}">.npmrc
 
       - name: Install npm package
         working-directory: ./FromA2B_Api_Client
