@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      # - develop
-      - features/*
+      - develop
   release:
     types: [created]
 
@@ -42,41 +41,39 @@ jobs:
       - name: Set NPM Token
         run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
 
-      # - name: Get NPM version
-      #   id: get_npm_version
-      #   run: |
-      #     NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
-      #     NPM_VERSION=$(echo "$NPM_VERSION" | cut -d '-' -f1)
-      #     echo "::set-output name=NPM_VERSION::$NPM_VERSION"
+      - name: Get NPM version
+        id: get_npm_version
+        run: |
+          NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
+          NPM_VERSION=$(echo "$NPM_VERSION" | cut -d '-' -f1)
+          echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
-      # - name: Setup npmTag
-      #   id: setup_npm_tag
-      #   run: |
-      #     case "${{ github.ref }}" in
-      #       # "refs/heads/develop")
-      #       "refs/heads/features/CI-CD-ClientApi")
-      #         echo "::set-output name=NPM_TAG::-Beta"
-      #         ;;
-      #       "refs/heads/main")
-      #         echo "::set-output name=NPM_TAG::-RC"
-      #         ;;
-      #     esac
+      - name: Setup npmTag
+        id: setup_npm_tag
+        run: |
+          case "${{ github.ref }}" in
+            "refs/heads/develop")
+              echo "::set-output name=NPM_TAG::-Beta"
+              ;;
+            "refs/heads/main")
+              echo "::set-output name=NPM_TAG::-RC"
+              ;;
+          esac
 
-      # - name: Setup new version
-      #   id: setup_new_version
-      #   run: |
-      #     case "${{ github.ref }}" in
-      #       refs/tags/fix* )
-      #         echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'patch'))")
-      #         ;;
-      #       # "refs/heads/develop")
-      #       "refs/heads/features/CI-CD-ClientApi")
-      #         echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'minor'))")
-      #         ;;
-      #       "refs/heads/main")
-      #         echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'major'))")
-      #         ;;
-      #     esac
+      - name: Setup new version
+        id: setup_new_version
+        run: |
+          case "${{ github.ref }}" in
+            refs/tags/hotfix* )
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'patch'))")
+              ;;
+            "refs/heads/develop")
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'minor'))")
+              ;;
+            "refs/heads/main")
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'major'))")
+              ;;
+          esac
 
       - name: install Open Api Tool CLI
         run: npm install @openapitools/openapi-generator-cli -g
@@ -85,7 +82,7 @@ jobs:
         run: |
           openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json \
           -g typescript-axios -c ./generatorConfig.json -o ./FromA2B_Api_Client/ \
-          --additional-properties=npmVersion=0.0.0-Beta \
+          --additional-properties=npmVersion=${{ steps.setup_new_version.outputs.NEW_VERSION }}${{ steps.setup_npm_tag.outputs.NPM_TAG }} \
           --additional-properties=npmRepository=https://npm.pkg.github.com
 
       - name: Upload API Client Artifact
