@@ -28,9 +28,10 @@ jobs:
         id: get_npm_version
         run: |
           NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
+          NPM_VERSION=$(echo "$NPM_VERSION" | cut -d '-' -f1)
           echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
-      - name: Setup npmTag
+      - name: Setup npmTag and new version
         id: setup_npm_tag
         run: |
           CURRENT_VERSION=${{ steps.get_npm_version.outputs.NPM_VERSION }}
