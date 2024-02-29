@@ -21,17 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup npmTag
-        id: setup_npm_tag
-        run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "::set-output name=NPM_TAG::-RC"
-          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
-            echo "::set-output name=NPM_TAG::-Beta"
-          elif [ "${{ github.ref }}" = refs/heads/features/* ]; then
-            echo "::set-output name=NPM_TAG::-Alpha"
-          fi
-
       - name: Set NPM Token
         run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
 
@@ -41,19 +30,25 @@ jobs:
           NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
           echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
-      - name: Determine new version
-        id: determine_new_version
+      - name: Setup npmTag
+        id: setup_npm_tag
         run: |
           CURRENT_VERSION=${{ steps.get_npm_version.outputs.NPM_VERSION }}
-          NPM_TAG=${{ steps.setup_npm_tag.outputs.NPM_TAG }}
-          case $NPM_TAG in
-            -RC) NEW_VERSION="${CURRENT_VERSION%%.*}.$((${CURRENT_VERSION##*.} + 1))";;
-            -Beta) NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))";;
-            -Alpha) NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))";;
-            *) NEW_VERSION=$CURRENT_VERSION;;
+          case "${{ github.ref }}" in
+            "refs/heads/main")
+              echo "::set-output name=NPM_TAG::-RC"
+              NEW_VERSION="${CURRENT_VERSION%%.*}.$((${CURRENT_VERSION##*.} + 1))"
+              ;;
+            "refs/heads/develop")
+              echo "::set-output name=NPM_TAG::-Beta"
+              NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))"
+              ;;
+            refs/heads/features/*)
+              echo "::set-output name=NPM_TAG::-Alpha"
+              NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))"
+              ;;
           esac
           echo "::set-output name=NEW_VERSION::$NEW_VERSION"
-          echo $NEW_VERSION
 
       - name: Cache Node.js modules
         uses: actions/cache@v2
