@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - develop
+      # - develop
+      - features/*
   release:
     types: [created]
 
@@ -39,7 +40,8 @@ jobs:
         id: setup_npm_tag
         run: |
           case "${{ github.ref }}" in
-            "refs/heads/develop")
+            # "refs/heads/develop")
+            "refs/heads/features/CI-CD-ClientApi")
               echo "::set-output name=NPM_TAG::-Beta"
               ;;
             "refs/heads/main")
@@ -58,7 +60,8 @@ jobs:
             refs/tags/fix* )
               PATCH=$((PATCH + 1))
               ;;
-            "refs/heads/develop")
+            # "refs/heads/develop")
+            "refs/heads/features/CI-CD-ClientApi")
               MINOR=$((MINOR + 1))
               ;;
             "refs/heads/main")
@@ -67,7 +70,7 @@ jobs:
           esac
 
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-          echo NEW_VERSION
+          echo $NEW_VERSION
           echo "::set-output name=NPM_VERSION::$NEW_VERSION"
 
       - name: Cache Node.js modules
