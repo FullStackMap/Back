@@ -49,6 +49,8 @@ jobs:
               ;;
           esac
 
+      - run: ls -R
+
       - name: Setup new version
         id: setup_new_version
         run: |
