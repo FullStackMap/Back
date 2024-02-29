@@ -32,32 +32,24 @@ jobs:
             echo "::set-output name=NPM_TAG::-Alpha"
           fi
 
-      - name: Get Latest Version
-        id: get_latest_version
+      - name: Get NPM version
+        id: get_npm_version
         run: |
-          latest_version=$(git describe --tags --abbrev=0)
-          echo "::set-output name=LATEST_VERSION::$latest_version"
+          NPM_VERSION=$(npm view @FullStackMap/from-a2b version)
+          echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
-      - name: Increment Version
-        id: increment_version
+      - name: Determine new version
+        id: determine_new_version
         run: |
-          # Extract major, minor, and patch version numbers
-          major=$(echo "${{ steps.get_latest_version.outputs.LATEST_VERSION }}" | cut -d. -f1)
-          minor=$(echo "${{ steps.get_latest_version.outputs.LATEST_VERSION }}" | cut -d. -f2)
-          patch=$(echo "${{ steps.get_latest_version.outputs.LATEST_VERSION }}" | cut -d. -f3)
-
-          # Increment version based on branch
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            ((minor++))
-          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
-            ((patch++))
-          elif [[ "${{ github.ref }}" == refs/heads/features/* ]]; then
-            ((patch++))
-          fi
-
-          # Construct the new version
-          new_version="$major.$minor.$patch"
-          echo "::set-output name=NEW_VERSION::$new_version"
+          CURRENT_VERSION=${{ steps.get_npm_version.outputs.NPM_VERSION }}
+          NPM_TAG=${{ steps.setup_npm_tag.outputs.NPM_TAG }}
+          case $NPM_TAG in
+            -RC) NEW_VERSION="${CURRENT_VERSION%%.*}.$((${CURRENT_VERSION##*.} + 1))";;
+            -Beta) NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))";;
+            -Alpha) NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))";;
+            *) NEW_VERSION=$CURRENT_VERSION;;
+          esac
+          echo "::set-output name=NEW_VERSION::$NEW_VERSION"
 
       - name: Cache Node.js modules
         uses: actions/cache@v2
