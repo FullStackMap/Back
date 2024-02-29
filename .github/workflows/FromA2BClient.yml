@@ -32,6 +32,33 @@ jobs:
             echo "::set-output name=NPM_TAG::-Alpha"
           fi
 
+      - name: Get Latest Version
+        id: get_latest_version
+        run: |
+          latest_version=$(git describe --tags --abbrev=0)
+          echo "::set-output name=LATEST_VERSION::$latest_version"
+
+      - name: Increment Version
+        id: increment_version
+        run: |
+          # Extract major, minor, and patch version numbers
+          major=$(echo "${{ steps.get_latest_version.outputs.LATEST_VERSION }}" | cut -d. -f1)
+          minor=$(echo "${{ steps.get_latest_version.outputs.LATEST_VERSION }}" | cut -d. -f2)
+          patch=$(echo "${{ steps.get_latest_version.outputs.LATEST_VERSION }}" | cut -d. -f3)
+
+          # Increment version based on branch
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            ((minor++))
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            ((patch++))
+          elif [[ "${{ github.ref }}" == refs/heads/features/* ]]; then
+            ((patch++))
+          fi
+
+          # Construct the new version
+          new_version="$major.$minor.$patch"
+          echo "::set-output name=NEW_VERSION::$new_version"
+
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -48,10 +75,6 @@ jobs:
 
       - name: install Open Api Tool CLI
         run: npm install @openapitools/openapi-generator-cli -g
-
-      - name: Get Variable value
-        id: get_npm_version
-        run: echo "::set-output name=NPM_VERSION::$(node -p 'require("./npmVersion.json").version')"
 
       - name: Create API Client
         run: |
