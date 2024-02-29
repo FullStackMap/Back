@@ -18,13 +18,26 @@ jobs:
       packages: read
       actions: read
 
-    outputs:
-      npm_version: ${{ steps.get_npm_version.outputs.NPM_VERSION }}
-      npm_tag: ${{ steps.setup_npm_tag.outputs.NPM_TAG }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://npm.pkg.github.com/
+
+      - name: install semver
+        run: npm install semver -g
 
       - name: Set NPM Token
         run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
@@ -49,45 +62,21 @@ jobs:
               ;;
           esac
 
-      - run: ls -R
-
       - name: Setup new version
         id: setup_new_version
         run: |
-          CURRENT_VERSION="${{ steps.get_npm_version.outputs.NPM_VERSION }}"
-          MAJOR=$(echo "$CURRENT_VERSION" | cut -d '.' -f1)
-          MINOR=$(echo "$CURRENT_VERSION" | cut -d '.' -f2)
-          PATCH=$(echo "$CURRENT_VERSION" | cut -d '.' -f3)
           case "${{ github.ref }}" in
             refs/tags/fix* )
-              PATCH=$((PATCH + 1))
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'patch'))")
               ;;
             # "refs/heads/develop")
             "refs/heads/features/CI-CD-ClientApi")
-              MINOR=$((MINOR + 1))
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'minor'))")
               ;;
             "refs/heads/main")
-              MAJOR=$((MAJOR + 1))
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'major'))")
               ;;
           esac
-
-          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-          echo $NEW_VERSION
-          echo "::set-output name=NEW_VERSION::$NEW_VERSION"
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://npm.pkg.github.com/
 
       - name: install Open Api Tool CLI
         run: npm install @openapitools/openapi-generator-cli -g
