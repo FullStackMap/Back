@@ -37,7 +37,7 @@ jobs:
           registry-url: https://npm.pkg.github.com/
 
       - name: install semver
-        run: npm install semver -g
+        run: npm install semver
 
       - name: Set NPM Token
         run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
