@@ -24,7 +24,7 @@ jobs:
       - name: Setup npmTag
         if: github.ref_name == 'develop'
         id: setup_npm_tag
-        run: echo "::set-output name=NPM_TAG::-Beta"
+        run: echo "::set-output name=NPM_TAG::-alpha"
 
       - name: Cache Node.js modules
         uses: actions/cache@v2
