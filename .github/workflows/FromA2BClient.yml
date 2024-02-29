@@ -35,7 +35,7 @@ jobs:
       - name: Get NPM version
         id: get_npm_version
         run: |
-          NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
+          NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/ --auth=${{ secrets.GITHUB_TOKEN }})
           echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
       - name: Determine new version
