@@ -64,7 +64,7 @@ jobs:
         id: setup_new_version
         run: |
           case "${{ github.ref }}" in
-            refs/tags/hotfix* )
+            refs/tags/patch* )
               echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'patch'))")
               ;;
             "refs/heads/develop")
