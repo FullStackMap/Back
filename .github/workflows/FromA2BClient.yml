@@ -34,9 +34,11 @@ jobs:
       - name: Create API Client
         run: openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json -g typescript-axios -c ./generatorConfig.json -o ./FromA2B_Api_Client/ --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
 
-      - name: Read Package.json
-        working-directory: ./FromA2B_Api_Client
-        run: cat ./package.json
+      - name: Add Files To Packagejson
+        uses: restackio/update-json-file-action@v2.0
+        with:
+          file: ./FromA2B_Api_Client/package.json
+          fields: '{"files": ["dist/"]}'
         
       - name: Set NPM Token
         working-directory: ./FromA2B_Api_Client
