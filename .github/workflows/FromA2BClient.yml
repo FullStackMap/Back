@@ -24,6 +24,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
+          registry-url: https://npm.pkg.github.com/
 
       - name: install Open Api Tool CLI
         run: npm install @openapitools/openapi-generator-cli -g
@@ -59,5 +60,6 @@ jobs:
           echo "NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")" >> $GITHUB_ENV
 
       - name: Create NPM publish
-        working-directory: ./FromA2B_Api_Client
         run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
