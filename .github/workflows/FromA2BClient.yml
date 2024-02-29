@@ -34,21 +34,25 @@ jobs:
       - name: Setup npmTag and new version
         id: setup_npm_tag
         run: |
-          CURRENT_VERSION=${{ steps.get_npm_version.outputs.NPM_VERSION }}
+          CURRENT_VERSION="${{ steps.get_npm_version.outputs.NPM_VERSION }}"
+          MAJOR=$(echo "$CURRENT_VERSION" | cut -d '.' -f1)
+          MINOR=$(echo "$CURRENT_VERSION" | cut -d '.' -f2)
+          PATCH=$(echo "$CURRENT_VERSION" | cut -d '.' -f3)
           case "${{ github.ref }}" in
             "refs/heads/main")
               echo "::set-output name=NPM_TAG::-RC"
-              NEW_VERSION="${CURRENT_VERSION%%.*}.$((${CURRENT_VERSION##*.} + 1))"
+              MAJOR=$((MAJOR + 1))
               ;;
             "refs/heads/develop")
               echo "::set-output name=NPM_TAG::-Beta"
-              NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))"
+              MINOR=$((MINOR + 1))
               ;;
             refs/heads/features/*)
               echo "::set-output name=NPM_TAG::-Alpha"
-              NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.} + 1))"
+              PATCH=$((PATCH + 1))
               ;;
           esac
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "::set-output name=NPM_VERSION::$NEW_VERSION"
 
       - name: Cache Node.js modules
