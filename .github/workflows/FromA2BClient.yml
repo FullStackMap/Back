@@ -11,6 +11,11 @@ jobs:
   ApiClient:
     name: Build And Create Api Client
     runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+      packages: write
+      actions: read
+      
     steps:
       - name: Checkout
         uses: actions/checkout@v3
