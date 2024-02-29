@@ -32,7 +32,7 @@ jobs:
         run: echo "NPM_PACKAGE_VERSION=$(node -p "require('./npmVersion.json').version")" >> $GITHUB_ENV
 
       - name: Create API Client
-        run: openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json -g typescript-axios -c ./generatorConfig.json -o ./FromA2B_Api_Client/ --additional-properties=npmName=@fullstackmap/fromA2B --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
+        run: openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json -g typescript-axios -c ./generatorConfig.json -o ./FromA2B_Api_Client/ --additional-properties=npmName=@fullstackmap/FromA2B --additional-properties=npmVersion=${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }} --additional-properties=npmRepository=https://npm.pkg.github.com
 
       - name: Add Files To Packagejson
         uses: restackio/update-json-file-action@v2.0
@@ -42,7 +42,7 @@ jobs:
         
       - name: Set NPM Token
         working-directory: ./FromA2B_Api_Client
-        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.PAT_TOKEN}}">.npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
 
       - name: Install npm package
         working-directory: ./FromA2B_Api_Client
