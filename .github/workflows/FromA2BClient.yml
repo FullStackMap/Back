@@ -54,6 +54,7 @@ jobs:
           esac
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "::set-output name=NPM_VERSION::$NEW_VERSION"
+          echo ${{ steps.get_npm_version.outputs.NPM_VERSION }}
 
       - name: Cache Node.js modules
         uses: actions/cache@v2
