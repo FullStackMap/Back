@@ -59,6 +59,8 @@ jobs:
       - name: Restore Tools
         run: dotnet tool restore
 
+      - run: ls -R
+
       - name: .Net Build
         uses: EasyDesk/action-dotnet-build@v1.0.0
         with:
