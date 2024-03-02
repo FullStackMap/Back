@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: FullStackMap/FromA2BClient
-          ref: ${{ github.ref_name }}
+          ref: refs/heads/features
           path: ./FromA2B_Api_Client
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
@@ -76,7 +76,7 @@ jobs:
         id: setup_npm_tag
         run: |
           case "${{ github.ref }}" in
-            "refs/heads/features/*")
+            refs/heads/features/*)
               echo "::set-output name=NPM_TAG::-Alpha"
               ;;
             "refs/heads/develop")
@@ -128,4 +128,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add -A
           git commit -m "Update FromA2B Client V${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }}"
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin HEAD:refs/heads/features
