@@ -38,6 +38,9 @@ jobs:
         with:
           dotnet-version: '8.x.x'
 
+      - name: create manifest
+        run: dotnet new tool-manifest
+
       - name: Install Nuget Package
         run: dotnet tool install Swashbuckle.AspNetCore.Cli
 
