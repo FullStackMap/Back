@@ -15,12 +15,22 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration">The configuration.</param>
     public static void AddMapDbContext(this IServiceCollection services, ConfigurationManager configuration)
     {
+        bool? inPipeline = Environment.GetEnvironmentVariable("USE_IN_MEMORY_DATABASE")?.ToLower() == "true";
         string? connectionString = configuration.GetConnectionString("Map_SQL");
 
-        services.AddDbContext<MapContext>(options =>
-            options.UseSqlServer(
-                connectionString == "DOCKER_CONNECTION_STRING" ? Environment.GetEnvironmentVariable("CONNECTION_STRING") : connectionString,
-                x => x.MigrationsAssembly(typeof(MapContext).Assembly.FullName)));
+        if (inPipeline is true)
+        {
+            services.AddDbContext<MapContext>(options =>
+                options.UseInMemoryDatabase("InMemoryDbMap"));
+        }
+        else
+        {
+            services.AddDbContext<MapContext>(options =>
+                options.UseSqlServer(
+                    string.IsNullOrWhiteSpace(connectionString) ? Environment.GetEnvironmentVariable("CONNECTION_STRING") : connectionString,
+                    x => x.MigrationsAssembly(typeof(MapContext).Assembly.FullName)));
+        }
+
     }
 
     /// <summary>
