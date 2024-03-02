@@ -65,7 +65,7 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Route("Login")]
     [MapToApiVersion(ApiControllerVersions.V1)]
-    [ProducesResponseType(typeof(ActionResult<TokenDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(TokenDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TokenDto>> Login([FromBody] LoginDto loginDto)

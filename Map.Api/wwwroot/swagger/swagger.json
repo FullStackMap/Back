@@ -39,17 +39,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/TokenDtoActionResult"
+                  "$ref": "#/components/schemas/TokenDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TokenDtoActionResult"
+                  "$ref": "#/components/schemas/TokenDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TokenDtoActionResult"
+                  "$ref": "#/components/schemas/TokenDto"
                 }
               }
             }
@@ -1356,7 +1356,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "RegisterDto": {
         "type": "object",
@@ -1408,18 +1408,6 @@
           "token": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "TokenDtoActionResult": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "$ref": "#/components/schemas/ActionResult"
-          },
-          "value": {
-            "$ref": "#/components/schemas/TokenDto"
           }
         },
         "additionalProperties": false
