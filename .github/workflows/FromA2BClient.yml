@@ -64,12 +64,12 @@ jobs:
         with:
           files: './Map.Api/appsettings.json'
         env:
-          JWTSettings.Secret: ${{secrets.JWT_KEY}}
-          JWTSettings.DurationTime: ${{secrets.DURATION_TIME}}
-          MailSettings.Server: ${{secrets.MAIL_SERVER}}
-          MailSettings.Port: ${{secrets.MAIL_PORT}}
-          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
-          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
+          JWTSettings__Secret: ${{secrets.JWT_KEY}}
+          JWTSettings__DurationTime: ${{secrets.DURATION_TIME}}
+          MailSettings__Server: ${{secrets.MAIL_SERVER}}
+          MailSettings__Port: ${{secrets.MAIL_PORT}}
+          MailSettings__UserName: ${{secrets.MAIL_USERNAME}}
+          MailSettings__Password: ${{secrets.MAIL_PASSWORD}}
 
       - run: dotnet restore ./Map.Api/Map.API.csproj
 
