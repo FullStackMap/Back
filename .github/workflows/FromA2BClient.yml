@@ -64,7 +64,7 @@ jobs:
       - name: .Net Build
         uses: EasyDesk/action-dotnet-build@v1.0.0
         with:
-          path: ./Map.sln
+          path: ../
 
       - name: Generate Swagger.json
         run: dotnet swagger tofile --output ./swagger.json ./Map.Api/bin/Release/net8.0/Map.API.dll v1
