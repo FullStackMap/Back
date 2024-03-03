@@ -36,7 +36,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Map.EFCore\Map.EFCore.csproj" />
-		<ProjectReference Include="..\Map.PLatform\Map.Platform.csproj" />
+		<ProjectReference Include="..\Map.Platform\Map.Platform.csproj" />
 		<ProjectReference Include="..\Map.Provider\Map.Provider.csproj" />
 	</ItemGroup>
 
