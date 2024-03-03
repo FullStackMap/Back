@@ -17,35 +17,18 @@ jobs:
       contents: read
       packages: read
       actions: read
-    env:
-      USE_IN_MEMORY_DATABASE: True
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Checkout FromA2B Repository
-        uses: actions/checkout@v2
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
         with:
-          repository: FullStackMap/FromA2BClient
-          ref: refs/heads/features
-          path: ./FromA2B_Api_Client
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
-
-      - name: Install .Net 8
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.x.x'
-
-      - name: create manifest
-        run: dotnet new tool-manifest
-
-      - name: Install Nuget Package
-        run: dotnet tool install Swashbuckle.AspNetCore.Cli
-
-      - name: install Open Api Tool CLI
-        run: npm install @openapitools/openapi-generator-cli -g
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install Node.js
         uses: actions/setup-node@v3
@@ -56,35 +39,15 @@ jobs:
       - name: install semver
         run: npm install semver
 
-      - name: Restore Tools
-        run: dotnet tool restore
+      - name: Set NPM Token
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
 
-      - name: App Settings Variable Substitution Global
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: './Map.Api/appsettings.json'
-        env:
-          JWTSettings.Secret: ${{secrets.JWT_KEY}}
-          JWTSettings.DurationTime: ${{secrets.DURATION_TIME}}
-          MailSettings.Server: ${{secrets.MAIL_SERVER}}
-          MailSettings.Port: ${{secrets.MAIL_PORT}}
-          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
-          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
-
-      - run: dotnet restore ./Map.Api/Map.API.csproj
-
-      - name: .Net Build
-        uses: EasyDesk/action-dotnet-build@v1.0.0
-        with:
-          path: ./
-
-      - name: Generate Swagger.json
-        run: dotnet swagger tofile --output ./swagger.json ./Map.Api/bin/Release/net8.0/Map.API.dll v1
-
-      - name: Get NPM Package Version
+      - name: Get NPM version
         id: get_npm_version
-        working-directory: ./FromA2B_Api_Client
-        run: echo "::set-output name=NPM_VERSION::$(node -p "require('./package.json').version")"
+        run: |
+          NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
+          NPM_VERSION=$(echo "$NPM_VERSION" | cut -d '-' -f1)
+          echo "::set-output name=NPM_VERSION::$NPM_VERSION"
 
       - name: Setup npmTag
         id: setup_npm_tag
@@ -116,6 +79,9 @@ jobs:
               ;;
           esac
 
+      - name: install Open Api Tool CLI
+        run: npm install @openapitools/openapi-generator-cli -g
+
       - name: Create API Client
         run: |
           openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json \
@@ -123,23 +89,58 @@ jobs:
           --additional-properties=npmVersion=${{ steps.setup_new_version.outputs.NEW_VERSION }}${{ steps.setup_npm_tag.outputs.NPM_TAG }} \
           --additional-properties=npmRepository=https://npm.pkg.github.com
 
-      - name: Add File To Packagejson
+      - name: Upload API Client Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: api-client
+          path: ./FromA2B_Api_Client
+
+  NpmPackage:
+    name: Build and Publish NPM Package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      actions: read
+
+    needs: ApiClient
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download API Client Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: api-client
+          path: ./FromA2B_Api_Client
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Update Package.json
         uses: restackio/update-json-file-action@v2.0
         with:
           file: ./FromA2B_Api_Client/package.json
-          fields: '{"files": ["dist"]}'
+          fields: '{"files": ["dist/"]}'
 
-      - name: count nb change in FromA2B_Api_Client repo
-        id: countChange
-        run: echo "nbChange=$(git diff --name-status | grep "^[MARD]" | wc -l)" >> $GITHUB_OUTPUT
+      - name: Set NPM Token
         working-directory: ./FromA2B_Api_Client
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
 
-      - name: Push to FromA2B_Api_Client if have modification
-        if: ${{ steps.countChange.outputs.nbChange != 0}}
+      - name: Install npm dependencies and build
         working-directory: ./FromA2B_Api_Client
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add -A
-          git commit -m "Update FromA2B Client V${{ env.NPM_PACKAGE_VERSION }}${{ env.npmTag }}"
-          git push origin HEAD:refs/heads/features
+          npm install
+          npm run build
+
+      - name: Publish API Client
+        working-directory: ./FromA2B_Api_Client
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
