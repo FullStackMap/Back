@@ -59,7 +59,17 @@ jobs:
       - name: Restore Tools
         run: dotnet tool restore
 
-      - run: ls -R
+      - name: App Settings Variable Substitution Global
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: './Map.Api/appsettings.json'
+        env:
+          JWTSettings.Secret: ${{secrets.JWT_KEY}}
+          JWTSettings.DurationTime: ${{secrets.DURATION_TIME}}
+          MailSettings.Server: ${{secrets.MAIL_SERVER}}
+          MailSettings.Port: ${{secrets.MAIL_PORT}}
+          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
+          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
 
       - name: .Net Build
         uses: EasyDesk/action-dotnet-build@v1.0.0
