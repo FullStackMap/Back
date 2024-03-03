@@ -71,7 +71,7 @@ jobs:
           MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
           MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
 
-      - run: dotnet restore ./Map.Api/Map.Api.csproj
+      - run: dotnet restore ./Map.Api/Map.API.csproj
 
       - name: .Net Build
         uses: EasyDesk/action-dotnet-build@v1.0.0
