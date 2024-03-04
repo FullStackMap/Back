@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Map.API", "Map.API\Map.API.csproj", "{0EB3C7E2-5165-4226-BB34-EEAE6CEDBA40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Map.API", "Map.Api\Map.API.csproj", "{0EB3C7E2-5165-4226-BB34-EEAE6CEDBA40}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Map.Domain", "Map.Domain\Map.Domain.csproj", "{5BFA3CF6-694C-4A59-935B-51D171DC25C6}"
 EndProject

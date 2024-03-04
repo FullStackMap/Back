@@ -1,0 +1,146 @@
+name: Create FromA2B Api Client & Publish NPM Package
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - features/*
+  release:
+    types: [created]
+
+jobs:
+  ApiClient:
+    name: Generate API Client
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://npm.pkg.github.com/
+
+      - name: install semver
+        run: npm install semver
+
+      - name: Set NPM Token
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
+
+      - name: Get NPM version
+        id: get_npm_version
+        run: |
+          NPM_VERSION=$(npm view @FullStackMap/from-a2b version --registry=https://npm.pkg.github.com/)
+          NPM_VERSION=$(echo "$NPM_VERSION" | cut -d '-' -f1)
+          echo "::set-output name=NPM_VERSION::$NPM_VERSION"
+
+      - name: Setup npmTag
+        id: setup_npm_tag
+        run: |
+          case "${{ github.ref }}" in
+            refs/heads/features/*)
+              echo "::set-output name=NPM_TAG::-Alpha"
+              ;;
+            "refs/heads/develop")
+              echo "::set-output name=NPM_TAG::-Beta"
+              ;;
+            "refs/heads/main")
+              echo "::set-output name=NPM_TAG::-RC"
+              ;;
+          esac
+
+      - name: Setup new version
+        id: setup_new_version
+        run: |
+          case "${{ github.ref }}" in
+            refs/heads/features/* )
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'patch'))")
+              ;;
+            "refs/heads/develop")
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'minor'))")
+              ;;
+            "refs/heads/main")
+              echo ::set-output name=NEW_VERSION::$(node -e "console.log(require('semver').inc('${{ steps.get_npm_version.outputs.NPM_VERSION }}', 'major'))")
+              ;;
+          esac
+
+      - name: install Open Api Tool CLI
+        run: npm install @openapitools/openapi-generator-cli -g
+
+      - name: Create API Client
+        run: |
+          openapi-generator-cli generate -i ./Map.Api/wwwroot/swagger/swagger.json \
+          -g typescript-axios -c ./generatorConfig.json -o ./FromA2B_Api_Client/ \
+          --additional-properties=npmVersion=${{ steps.setup_new_version.outputs.NEW_VERSION }}${{ steps.setup_npm_tag.outputs.NPM_TAG }} \
+          --additional-properties=npmRepository=https://npm.pkg.github.com
+
+      - name: Upload API Client Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: api-client
+          path: ./FromA2B_Api_Client
+
+  NpmPackage:
+    name: Build and Publish NPM Package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      actions: read
+
+    needs: ApiClient
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download API Client Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: api-client
+          path: ./FromA2B_Api_Client
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Update Package.json
+        uses: restackio/update-json-file-action@v2.0
+        with:
+          file: ./FromA2B_Api_Client/package.json
+          fields: '{"files": ["dist/"]}'
+
+      - name: Set NPM Token
+        working-directory: ./FromA2B_Api_Client
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}">.npmrc
+
+      - name: Install npm dependencies and build
+        working-directory: ./FromA2B_Api_Client
+        run: |
+          npm install
+          npm run build
+
+      - name: Publish API Client
+        working-directory: ./FromA2B_Api_Client
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
