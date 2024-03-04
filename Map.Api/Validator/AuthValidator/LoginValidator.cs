@@ -14,11 +14,14 @@ public class LoginValidator : AbstractValidator<LoginDto>
             .WithErrorCode(EAuthErrorCodes.DtoNotNull.ToStringValue())
             .WithMessage("Dto is required");
 
-        #region Username
-        RuleFor(dto => dto.Username)
+        #region Email
+        RuleFor(dto => dto.Email)
             .NotNull()
             .WithErrorCode(EMapUserErrorCodes.UserNameNotEmpty.ToStringValue())
-            .WithMessage("Username is required");
+            .WithMessage("Email is required")
+            .EmailAddress()
+            .WithErrorCode(EMapUserErrorCodes.EmailNotValid.ToStringValue())
+            .WithMessage("Email must be valid");
 
         #endregion
 

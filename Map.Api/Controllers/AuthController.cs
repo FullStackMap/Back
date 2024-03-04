@@ -60,7 +60,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Login user
     /// </summary>
-    /// <remarks> {  "username": "Dercraker",  "password": "NMdRx$HqyT8jX6" }</remarks>
+    /// <remarks> {  "email": "antoine.capitain+MapPfe@gmail.com",  "password": "NMdRx$HqyT8jX6" }</remarks>
     /// <param name="loginDto">LoginDto</param>
     [HttpPost]
     [Route("Login")]
@@ -76,8 +76,7 @@ public class AuthController : ControllerBase
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
         }
 
-        MapUser? user = await _userManager.FindByNameAsync(loginDto.Username);
-        user ??= await _userManager.FindByEmailAsync(loginDto.Username);
+        MapUser? user = await _userManager.FindByEmailAsync(loginDto.Email);
 
         if (user is not null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
         {
