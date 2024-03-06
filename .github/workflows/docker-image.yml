@@ -2,17 +2,101 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - develop
+      - features/*
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+      - develop
+
+env:
+  dockerTag: Prod
+  aspnet_Core: Production
 
 jobs:
-
-  build:
-
+  CICD:
+    name: Building and deploy Image gametrip-api
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup dockerTag to Dev
+        if: github.ref_name == 'feature/*'
+        run: |
+          echo "dockerTag=dev" >> $GITHUB_ENV
+
+      - name: Setup dockerTag to Staging
+        if: github.ref_name == 'develop'
+        run: |
+          echo "dockerTag=staging" >> $GITHUB_ENV
+
+      - name: DockerHub login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: App Settings Variable Substitution Dev
+        uses: microsoft/variable-substitution@v1
+        if: github.ref_name == 'feature/*'
+        with:
+          files: './Map.Api/appsettings.json'
+        env:
+          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2B_SQL_DEV}}
+
+      - name: App Settings Variable Substitution Staging
+        uses: microsoft/variable-substitution@v1
+        if: github.ref_name == 'develop'
+        with:
+          files: './Map.Api/appsettings.json'
+        env:
+          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2B_SQL_STAGING}}
+
+      - name: App Settings Variable Substitution Production
+        uses: microsoft/variable-substitution@v1
+        if: github.ref_name == 'main'
+        with:
+          files: './GameTrip/GameTrip.API/appsettings.Production.json'
+        env:
+          ConnectionStrings.GameTripSQL: ${{secrets.FROMA2B_SQL_PROD}}
+
+      - name: App Settings Variable Substitution Global
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: './Map.Api/appsettings.json'
+        env:
+          JWTSettings.Secret: ${{secrets.JWT_KEY}}
+          MailSettings.Server: ${{secrets.MAIL_SERVER}}
+          MailSettings.Port: ${{secrets.MAIL_PORT}}
+          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
+          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
+
+      - name: Build Docker Image
+        working-directory: ./GameTrip/
+        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/gametrip-api:${{ env.dockerTag }}  ./
+
+      - name: Push Docker Image to Registry
+        run: docker push ${{ secrets.REGISTRY_NAME }}/gametrip-api:${{ env.dockerTag }}
+
+      # - name: PUT Request Action to update Stack - STAGING
+      #   if: github.ref_name == 'develop'
+      #   uses: fjogeleit/http-request-action@v1.13.0
+      #   with:
+      #     url: '${{ secrets.PORTAINER_UPDATE_STACK_API_STAGING_URL }}'
+      #     method: 'PUT'
+      #     timeout: 20000
+      #     customHeaders: '${{ secrets.CUSTOM_HEADERS }}'
+      #     data: '${{ vars.PORTAINER_UPDATE_STACK_API_STAGING }}'
+
+      # - name: PUT Request Action to update Stack - PROD
+      #   if: github.ref_name == 'main'
+      #   uses: fjogeleit/http-request-action@v1.13.0
+      #   with:
+      #     url: '${{ secrets.PORTAINER_UPDATE_STACK_API_PROD_URL }}'
+      #     method: 'PUT'
+      #     timeout: 20000
+      #     customHeaders: '${{ secrets.CUSTOM_HEADERS }}'
+      #     data: '${{ vars.PORTAINER_UPDATE_STACK_API_PROD }}'
