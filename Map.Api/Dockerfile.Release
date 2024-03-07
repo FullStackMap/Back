@@ -1,4 +1,4 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 as runtime
 WORKDIR /app
-COPY \bin\Release\net8.0 .
+COPY /bin/Release/net8.0 .
 ENTRYPOINT ["dotnet", "./Map.API.dll"]
