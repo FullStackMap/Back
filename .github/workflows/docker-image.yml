@@ -18,6 +18,8 @@ jobs:
   setup_tag:
     name: Setup dockerTag
     runs-on: ubuntu-latest
+    outputs:
+      docker_tag: ${{ steps.setup_docker_tag.outputs.DockerTag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -112,7 +114,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ steps.setup_docker_tag.outputs.DockerTag }} ./compiled-files
+        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ needs.setup_tag.outputs.docker_tag }} ./compiled-files
 
       - name: Push Docker Image to Registry
-        run: docker push ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ steps.setup_docker_tag.outputs.DockerTag }}
+        run: docker push ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ needs.setup_tag.outputs.docker_tag }}
