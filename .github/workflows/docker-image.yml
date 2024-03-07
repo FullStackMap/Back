@@ -117,6 +117,8 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - run: ls -R
+
       - name: Build Docker Image
         run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ env.dockerTag }} ./compiled-files
 
