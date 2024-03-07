@@ -36,6 +36,8 @@ jobs:
   restore_build:
     name: Restore and Build Project
     runs-on: ubuntu-latest
+    outputs:
+      artifact_path: ${{ steps.build.outputs.artifact_path }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
     steps:
@@ -94,7 +96,16 @@ jobs:
         run: dotnet restore ./Map.Api/Map.API.csproj
 
       - name: Build project
-        run: dotnet build ./Map.Api/Map.API.csproj --configuration Release
+        id: build
+        run: |
+          mkdir -p build
+          dotnet build ./Map.Api/Map.API.csproj --configuration Release --output ./build/
+
+      - name: Archive compiled files
+        uses: actions/upload-artifact@v2
+        with:
+          name: compiled-files
+          path: ./
 
   CI:
     name: Building and deploy Image from-a2b-api
@@ -106,6 +117,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Download compiled files artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: compiled-files
+          path: ./compiled-files
+
       - name: DockerHub login
         uses: docker/login-action@v1
         with:
@@ -113,7 +130,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ env.dockerTag }} ./
+        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ env.dockerTag }} ./compiled-files
 
       - name: Push Docker Image to Registry
         run: docker push ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ env.dockerTag }}
