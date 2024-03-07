@@ -1,6 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 as runtime
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
 COPY . .
 ENTRYPOINT ["dotnet", "./Map.API.dll"]
