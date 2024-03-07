@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - develop
-      - features/*
   pull_request:
     branches:
       - main
@@ -28,11 +27,8 @@ jobs:
         id: setup_docker_tag
         run: |
           case "${{ github.ref }}" in
-            refs/heads/features/*)
-              echo "::set-output name=DockerTag::dev"
-              ;;
             "refs/heads/develop")
-              echo "::set-output name=DockerTag::develop"
+              echo "::set-output name=DockerTag::dev"
               ;;
             "refs/heads/main")
               echo "::set-output name=DockerTag::rc"
@@ -128,11 +124,8 @@ jobs:
       - name: Send POST request to Portainer webhook
         run: |
           case "${{ github.ref }}" in
-            refs/heads/features/*)
-              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_API_DEV }}
-              ;;
             "refs/heads/develop")
-              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_API_DEVELOP }}
+              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_API_DEV }}
               ;;
             "refs/heads/main")
               curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_STAGING }}
