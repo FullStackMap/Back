@@ -99,7 +99,7 @@ jobs:
         id: build
         run: |
           mkdir -p build
-          dotnet build ./Map.Api/Map.API.csproj --configuration Release
+          dotnet build ./Map.Api/Map.API.csproj --configuration Release --output ./build
 
   CI:
     name: Building and deploy Image from-a2b-api
