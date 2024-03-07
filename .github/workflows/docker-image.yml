@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup dockerTag to Dev
-        if: github.ref_name == 'features/*'
+        if: startsWith(github.ref, 'refs/heads/features/')
         run: |
           echo "dockerTag=dev" >> $GITHUB_ENV
 
@@ -57,30 +57,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-dotnet-
 
-      - name: App Settings Variable Substitution Dev
-        uses: microsoft/variable-substitution@v1
-        if: github.ref_name == 'feature/*'
-        with:
-          files: './Map.Api/appsettings.json'
-        env:
-          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2B_SQL_DEV}}
-
-      - name: App Settings Variable Substitution Staging
-        uses: microsoft/variable-substitution@v1
-        if: github.ref_name == 'develop'
-        with:
-          files: './Map.Api/appsettings.json'
-        env:
-          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2B_SQL_STAGING}}
-
-      - name: App Settings Variable Substitution Production
-        uses: microsoft/variable-substitution@v1
-        if: github.ref_name == 'main'
-        with:
-          files: './Map.Api/appsettings.json'
-        env:
-          ConnectionStrings.MAP_SQL: ${{secrets.FROMA2B_SQL_PROD}}
-
       - name: App Settings Variable Substitution Global
         uses: microsoft/variable-substitution@v1
         with:
@@ -97,6 +73,8 @@ jobs:
 
       - name: Build project
         id: build
+        env:
+          USE_IN_MEMORY_DATABASE: 'true'
         run: |
           mkdir -p build
           dotnet build ./Map.Api/Map.API.csproj --configuration Release --output ./build
