@@ -12,7 +12,6 @@ on:
       - develop
 
 env:
-  dockerTag: Prod
   aspnet_Core: Production
 
 jobs:
@@ -23,15 +22,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup dockerTag to Dev
-        if: startsWith(github.ref, 'refs/heads/features/')
+      - name: Setup dockerTag
+        id: setup_docker_tag
         run: |
-          echo "dockerTag=dev" >> $GITHUB_ENV
-
-      - name: Setup dockerTag to Staging
-        if: github.ref_name == 'develop'
-        run: |
-          echo "dockerTag=staging" >> $GITHUB_ENV
+          case "${{ github.ref }}" in
+            refs/heads/features/*)
+              echo "::set-output name=DockerTag::dev"
+              ;;
+            "refs/heads/develop")
+              echo "::set-output name=DockerTag::develop"
+              ;;
+            "refs/heads/main")
+              echo "::set-output name=DockerTag::rc"
+              ;;
+          esac
 
   restore_build:
     name: Restore and Build Project
@@ -108,7 +112,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ env.dockerTag }} ./compiled-files
+        run: docker build --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ steps.setup_docker_tag.outputs.DockerTag }} ./compiled-files
 
       - name: Push Docker Image to Registry
-        run: docker push ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ env.dockerTag }}
+        run: docker push ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ steps.setup_docker_tag.outputs.DockerTag }}
