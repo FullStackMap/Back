@@ -17,7 +17,7 @@ using static Map.API.Controllers.Models.HttpError;
 namespace Map.API.Controllers;
 
 [ApiController]
-[ApiVersion(ApiControllerVersions.LastVersion)]
+[ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class UserController : ControllerBase
 {
@@ -56,7 +56,7 @@ public class UserController : ControllerBase
     [Authorize]
     [HttpPatch]
     [Route("{userId}/email")]
-    [MapToApiVersion(ApiControllerVersions.LastVersion)]
+    [MapToApiVersion(ApiControllerVersions.V1)]
     [ProducesResponseType(typeof(TripDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
