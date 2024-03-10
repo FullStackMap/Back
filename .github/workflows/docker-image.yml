@@ -9,6 +9,8 @@ on:
     branches:
       - main
       - develop
+  release:
+    types: [published]
 
 env:
   aspnet_Core: Production
@@ -26,14 +28,28 @@ jobs:
       - name: Setup dockerTag
         id: setup_docker_tag
         run: |
-          case "${{ github.ref }}" in
-            "refs/heads/develop")
-              echo "::set-output name=DockerTag::dev"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          case "${{ github.base_ref }}" in
+            "develop")
+              echo "::set-output name=DockerTag::dev-pr"
               ;;
-            "refs/heads/main")
-              echo "::set-output name=DockerTag::rc"
+            "main")
+              echo "::set-output name=DockerTag::main-pr"
               ;;
           esac
+          else
+            case "${{ github.ref }}" in
+              "refs/heads/develop")
+                echo "::set-output name=DockerTag::dev"
+                ;;
+              "refs/heads/main")
+                echo "::set-output name=DockerTag::rc"
+                ;;
+              "refs/tags/*")
+                echo "::set-output name=DockerTag::release"
+                ;;
+            esac
+          fi
 
   restore_build:
     name: Restore and Build Project
@@ -52,7 +68,7 @@ jobs:
           dotnet-version: 8.x.x
 
       - name: Cache .NET packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj') }}
@@ -129,5 +145,8 @@ jobs:
               ;;
             "refs/heads/main")
               curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_STAGING }}
+              ;;
+            "refs/tags/*")
+              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_API_RELEASE }}
               ;;
           esac
