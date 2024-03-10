@@ -66,6 +66,7 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             t.Property(t => t.Description);
             t.Property(t => t.StartDate).IsRequired();
             t.Property(t => t.EndDate).IsRequired();
+            t.Property(t => t.BackgroundPicturePath).IsRequired();
 
             t.HasMany(t => t.Steps)
                 .WithOne(s => s.Trip)

@@ -24,23 +24,6 @@ public class AddTripValidator : AbstractValidator<AddTripDto>
 
         #endregion
 
-        #region UserId
-
-        //Check if the UserId is not empty
-        RuleFor(trip => trip.UserId)
-            .NotEmpty()
-            .WithErrorCode(EMapUserErrorCodes.UserIdNotNull.ToString())
-            .WithMessage("UserId is required")
-        //Check if the user exists with userManager of entity framework
-        .MustAsync(async (trip, userId, cancellationToken) =>
-        {
-            MapUser? user = await userManager.FindByIdAsync(userId.ToString());
-            return user is not null;
-        })
-        .WithErrorCode(EMapUserErrorCodes.UserNotFoundById.ToString())
-        .WithMessage("User not found");
-
-        #endregion
 
         #region Name
 

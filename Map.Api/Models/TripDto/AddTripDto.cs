@@ -29,4 +29,9 @@ public class AddTripDto
     /// End date of the trip.
     /// </summary>
     public DateOnly? EndDate { get; set; }
+
+    /// <summary>
+    /// Path of the background picture.
+    /// </summary>
+    public string? BackgroundPicturePath { get; set; }
 }

@@ -9,6 +9,7 @@ public class Trip
     public string? Description { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
+    public string? BackgroundPicturePath { get; set; }
 
     public virtual IList<Step>? Steps { get; set; }
 }
