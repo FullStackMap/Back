@@ -1,0 +1,152 @@
+name: Build and Deploy From A2B API
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  release:
+    types: [published]
+
+env:
+  aspnet_Core: Production
+
+jobs:
+  setup_tag:
+    name: Setup dockerTag
+    runs-on: ubuntu-latest
+    outputs:
+      docker_tag: ${{ steps.setup_docker_tag.outputs.DockerTag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup dockerTag
+        id: setup_docker_tag
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          case "${{ github.base_ref }}" in
+            "develop")
+              echo "::set-output name=DockerTag::dev-pr"
+              ;;
+            "main")
+              echo "::set-output name=DockerTag::main-pr"
+              ;;
+          esac
+          else
+            case "${{ github.ref }}" in
+              "refs/heads/develop")
+                echo "::set-output name=DockerTag::dev"
+                ;;
+              "refs/heads/main")
+                echo "::set-output name=DockerTag::rc"
+                ;;
+              "refs/tags/*")
+                echo "::set-output name=DockerTag::release"
+                ;;
+            esac
+          fi
+
+  restore_build:
+    name: Restore and Build Project
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_path: ${{ steps.build.outputs.artifact_path }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET 8.0 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 8.x.x
+
+      - name: Cache .NET packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnet-
+
+      - name: App Settings Variable Substitution Global
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: './Map.Api/appsettings.json'
+        env:
+          JWTSettings.Secret: ${{secrets.JWT_KEY}}
+          MailSettings.Server: ${{secrets.MAIL_SERVER}}
+          MailSettings.Port: ${{secrets.MAIL_PORT}}
+          MailSettings.UserName: ${{secrets.MAIL_USERNAME}}
+          MailSettings.Password: ${{secrets.MAIL_PASSWORD}}
+
+      - name: Restore dependencies
+        run: dotnet restore ./Map.Api/Map.API.csproj
+
+      - name: Build project
+        id: build
+        env:
+          USE_IN_MEMORY_DATABASE: 'true'
+        run: |
+          mkdir -p build
+          dotnet build ./Map.Api/Map.API.csproj --configuration Release --output ./build
+
+      - name: Archive compiled files
+        uses: actions/upload-artifact@v2
+        with:
+          name: compiled-files
+          path: ./build/*
+
+  CI:
+    name: Building and deploy Image from-a2b-api
+    runs-on: ubuntu-latest
+    needs:
+      - setup_tag
+      - restore_build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download compiled files artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: compiled-files
+          path: ./compiled-files
+
+      - name: DockerHub login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker Image
+        run: docker buildx build --platform linux/amd64,linux/arm --file ./Map.Api/Dockerfile.Release --tag ${{ secrets.REGISTRY_NAME }}/from-a2b-api:${{ needs.setup_tag.outputs.docker_tag }} --push ./compiled-files
+
+  CD:
+    name: Update Portainer Service
+    runs-on: ubuntu-latest
+    needs: CI
+    if: ${{ needs.CI.result == 'success' }}
+    steps:
+      - name: Send POST request to Portainer webhook
+        run: |
+          case "${{ github.ref }}" in
+            "refs/heads/develop")
+              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_API_DEV }}
+              ;;
+            "refs/heads/main")
+              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_STAGING }}
+              ;;
+            "refs/tags/*")
+              curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.FROMA2B_PORTAINER_WEBHOOK_API_RELEASE }}
+              ;;
+          esac

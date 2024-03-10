@@ -49,17 +49,17 @@ public class TripController : ControllerBase
 
     #endregion
 
-    //[AllowAnonymous]
-    //[HttpPost]
-    //[Route("Initialize")]
-    //[MapToApiVersion(ApiControllerVersions.V1)]
-    //public async Task<IActionResult> Initialize([FromServices] DBInitializer dBInitializer)
-    //{
-    //    bool result = await dBInitializer.Initialize();
-    //    string resultMessage = $"Initialisation DB : {(result ? "Succès" : "DB existe déja")}";
+    [AllowAnonymous]
+    [HttpPost]
+    [Route("Initialize")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    public async Task<IActionResult> Initialize([FromServices] DBInitializer dBInitializer)
+    {
+        bool result = await dBInitializer.Initialize();
+        string resultMessage = $"Initialisation DB : {(result ? "Succès" : "DB existe déja")}";
 
-    //    return Ok(resultMessage);
-    //}
+        return Ok(resultMessage);
+    }
 
     /// <summary>
     /// Create a new trip
