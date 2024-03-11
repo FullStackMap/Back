@@ -2,7 +2,7 @@
 using Map.API.Extension;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
-using Map.Domain.Models.AuthDto;
+using Map.Domain.Models.Auth;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;

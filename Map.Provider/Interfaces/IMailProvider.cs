@@ -1,10 +1,4 @@
-﻿using Map.Domain.Models.EmailDto;
-using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MimeKit;
 
 namespace Map.Provider.Interfaces;
 public interface IMailProvider

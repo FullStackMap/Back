@@ -1,9 +1,9 @@
-namespace Map.Domain.Models.TripDto;
+﻿namespace Map.Domain.Models.Trip;
 
 /// <summary>
-/// Dto for udpate a trip.
+/// Dto for adding a trip.
 /// </summary>
-public class UpdateTripDto
+public class AddTripDto
 {
     /// <summary>
     /// Id of the user who created the trip.
@@ -28,7 +28,7 @@ public class UpdateTripDto
     /// <summary>
     /// End date of the trip.
     /// </summary>
-    public DateOnly EndDate { get; set; }
+    public DateOnly? EndDate { get; set; }
 
     /// <summary>
     /// Path of the background picture.

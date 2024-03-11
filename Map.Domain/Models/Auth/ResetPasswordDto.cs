@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Map.Domain.Models.AuthDto;
+namespace Map.Domain.Models.Auth;
 public class ResetPasswordDto
 {
     public string Email { get; set; }
-    public string Password { get; set;}
-    public string PasswordConfirmation { get; set;}
+    public string Password { get; set; }
+    public string PasswordConfirmation { get; set; }
     public string Token { get; set; }
 }
 

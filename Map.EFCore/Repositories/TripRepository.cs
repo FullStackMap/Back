@@ -1,5 +1,5 @@
 ﻿using Map.Domain.Entities;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Trip;
 using Map.EFCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

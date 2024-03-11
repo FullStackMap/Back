@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Map.Domain.Models.AuthDto;
+namespace Map.Domain.Models.Auth;
 
 public class ConfirmMailDto
 {

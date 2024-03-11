@@ -1,7 +1,7 @@
 ﻿using Map.Domain.Entities;
-using Map.Domain.Models.Trip;
 using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
+using Map.Domain.Models.Trip;
 
 namespace Map.Platform;
 public class TripPlatform : ITripPlatform

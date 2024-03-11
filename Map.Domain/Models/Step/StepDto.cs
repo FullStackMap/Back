@@ -1,11 +1,13 @@
-﻿namespace Map.Domain.Entities;
+﻿using Map.Domain.Models.Trip;
 
-public class Step
+namespace Map.Domain.Models.Step;
+
+public class StepDto
 {
     public Guid StepId { get; set; }
     public Guid TripId { get; set; }
     public int StepNumber { get; set; }
-    public virtual Trip? Trip { get; set; }
+    public virtual TripDto? Trip { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
 
@@ -14,7 +16,7 @@ public class Step
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
 
-    public virtual IList<TravelTo>? TravelsTo { get; set; }
-    public virtual IList<Reservation>? Reservations { get; set; }
-
+    //TODO update this when TravelTo and Reservation are implemented
+    //public virtual IList<TravelTo>? TravelsTo { get; set; }
+    //public virtual IList<Reservation>? Reservations { get; set; }
 }

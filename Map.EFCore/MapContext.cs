@@ -63,7 +63,7 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             t.HasKey(t => t.TripId);
 
             t.Property(t => t.Name).IsRequired();
-            t.Property(t => t.Description);
+            t.Property(t => t.Description).HasMaxLength(500);
             t.Property(t => t.StartDate).IsRequired();
             t.Property(t => t.EndDate).IsRequired();
             t.Property(t => t.BackgroundPicturePath).IsRequired();
@@ -79,8 +79,10 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             s.ToTable(name: "Steps");
             s.HasKey(s => s.StepId);
 
+            s.Property(s => s.StepNumber).IsRequired();
+            s.Property(s => s.TripId).IsRequired();
             s.Property(s => s.Name).IsRequired();
-            s.Property(s => s.Description);
+            s.Property(s => s.Description).HasMaxLength(500);
             s.Property(s => s.StartDate);
             s.Property(s => s.EndDate);
             s.Property(s => s.Latitude).IsRequired();

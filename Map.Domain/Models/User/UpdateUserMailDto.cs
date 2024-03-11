@@ -1,4 +1,4 @@
-﻿namespace Map.API.Models.UserDto;
+﻿namespace Map.Domain.Models.User;
 
 public class UpdateUserMailDto
 {

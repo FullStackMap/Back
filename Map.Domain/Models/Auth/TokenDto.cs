@@ -1,4 +1,4 @@
-﻿namespace Map.Domain.Models.AuthDto;
+﻿namespace Map.Domain.Models.Auth;
 public class TokenDto
 {
     public TokenDto(string token)

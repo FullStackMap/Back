@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
-using Map.Domain.Models.AuthDto;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Auth;
 
 namespace Map.API.AutoMapperProfies;
 

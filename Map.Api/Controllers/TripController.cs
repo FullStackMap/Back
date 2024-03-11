@@ -2,10 +2,9 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Trip;
 using Map.EFCore;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Authorization;
