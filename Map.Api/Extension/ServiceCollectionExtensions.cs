@@ -3,8 +3,10 @@ using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
 using Map.API.Models.TripDto;
+using Map.API.Models.UserDto;
 using Map.API.Validator.AuthValidator;
 using Map.API.Validator.TripValidator;
+using Map.API.Validator.UserValidator;
 using Map.Domain.Entities;
 using Map.Domain.Models.AuthDto;
 using Map.Domain.Models.TripDto;
@@ -79,7 +81,7 @@ public static class ServiceCollectionExtensions
 
         services.AddControllers();
     }
-    
+
     /// <summary>
     /// Add settings as services
     /// </summary>
@@ -118,6 +120,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidator<ConfirmMailDto>, ConfirmMailValidator>();
         services.AddScoped<IValidator<ForgotPasswordDto>, ForgotPasswordValidator>();
         services.AddScoped<IValidator<ResetPasswordDto>, ResetPasswordValidator>();
+        #endregion
+
+        #region UserValidator
+        services.AddScoped<IValidator<UpdateUserMailDto>, UpdateUserMailValidator>();
         #endregion
         return services;
     }

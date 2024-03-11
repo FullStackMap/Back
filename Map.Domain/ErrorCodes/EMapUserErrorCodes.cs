@@ -12,4 +12,5 @@ public enum EMapUserErrorCodes
     UsernameNotUnique = 009,
     EmailNotUnique = 010,
     UserNotFoundByEmail = 011,
+    DtoNotNull = 12,
 }

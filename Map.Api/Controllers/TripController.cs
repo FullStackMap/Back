@@ -74,7 +74,7 @@ public class TripController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> AddTrip([FromBody] AddTripDto addTripDto)
+    public async Task<ActionResult<TripDto>> AddTrip([FromBody] AddTripDto addTripDto)
     {
         ValidationResult validationResult = await _addTripValidator.ValidateAsync(addTripDto);
         if (!validationResult.IsValid)
@@ -98,13 +98,13 @@ public class TripController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllTripAsync()
+    public async Task<ActionResult<List<TripDto>>> GetAllTripAsync()
     {
         List<Trip> entities = await _tripPlatform.GetAllAsync();
         if (entities is null || !entities.Any())
             return NoContent();
 
-        return Ok(_mapper.Map<List<Trip>, List<TripDto>>(entities));
+        return _mapper.Map<List<Trip>, List<TripDto>>(entities);
     }
 
     /// <summary>
@@ -119,13 +119,13 @@ public class TripController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetTripById([FromRoute] Guid tripId)
+    public async Task<ActionResult<TripDto>> GetTripById([FromRoute] Guid tripId)
     {
         Trip? entity = await _tripPlatform.GetTripByIdAsync(tripId);
         if (entity is null)
             return NotFound(new Error(nameof(ETripErrorCodes.TripNotFoundById), $"Trip with id: {tripId} not found"));
 
-        return Ok(_mapper.Map<Trip, TripDto>(entity));
+        return _mapper.Map<Trip, TripDto>(entity);
     }
 
     /// <summary>
@@ -135,18 +135,19 @@ public class TripController : ControllerBase
     [HttpGet]
     [Route("User/{userId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
-    [ProducesResponseType(typeof(TripDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<TripDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllTripByUserIdAsync([FromRoute] Guid userId)
+    public async Task<ActionResult<List<TripDto>>> GetAllTripByUserIdAsync([FromRoute] Guid userId)
     {
         List<Trip>? entities = await _tripPlatform.GetTripListByUserIdAsync(userId);
         if (entities is null || !entities.Any())
             return NoContent();
 
-        return Ok(_mapper.Map<List<Trip>, List<TripDto>>(entities));
+        return _mapper.Map<List<Trip>, List<TripDto>>(entities);
     }
 
     /// <summary>
