@@ -21,6 +21,7 @@ public class TripRepository : GenericRepository<Trip>, ITripRepository
         trip.Description = update.Description;
         trip.StartDate = update.StartDate;
         trip.EndDate = update.EndDate;
+        trip.BackgroundPicturePath = update.BackgroundPicturePath;
 
         await _context.SaveChangesAsync();
         return trip;

@@ -17,4 +17,5 @@ public enum ETripErrorCodes
     TripNameMinLength = 114,
     TripNameUniqueByUser = 115,
     TripNotFoundById = 116,
+    TripBackgroundPicturePathNotNull = 117,
 }

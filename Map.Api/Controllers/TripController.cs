@@ -80,6 +80,9 @@ public class TripController : ControllerBase
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
+        if (addTripDto.BackgroundPicturePath is null)
+            addTripDto.BackgroundPicturePath = "https://www.voyageursdumonde.fr/voyage-sur-mesure/magazine-voyage/showphoto/1357/0";
+
         Trip entity = _mapper.Map<AddTripDto, Trip>(addTripDto);
         await _tripPlatform.AddTripAsync(entity);
 
@@ -170,6 +173,9 @@ public class TripController : ControllerBase
         ValidationResult validationResult = await _updateTripValidator.ValidateAsync(updateTripDto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        if (updateTripDto.BackgroundPicturePath is null)
+            updateTripDto.BackgroundPicturePath = "https://www.voyageursdumonde.fr/voyage-sur-mesure/magazine-voyage/showphoto/1357/0";
 
         Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
         if (trip is null)
