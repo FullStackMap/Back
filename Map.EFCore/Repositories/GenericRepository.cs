@@ -36,6 +36,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public T? GetById(Guid id) => _context.Set<T>().Find(id);
 
     /// <inheritdoc/>
+    public bool IsExist(Guid id) => _context.Set<T>().Find(id) is not null;
+
+    /// <inheritdoc/>
+    public async Task<bool> IsExistAsync(Guid id) => await _context.Set<T>().FindAsync(id) is not null;
+
+    /// <inheritdoc/>
     public IQueryable<T> GetAll() => _context.Set<T>().AsQueryable();
 
     /// <inheritdoc/>

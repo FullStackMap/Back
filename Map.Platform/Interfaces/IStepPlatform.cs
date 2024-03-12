@@ -1,5 +1,4 @@
 ﻿using Map.Domain.Entities;
-using Map.Domain.Models.Step;
 
 namespace Map.Platform.Interfaces;
 public interface IStepPlatform
@@ -13,7 +12,7 @@ public interface IStepPlatform
     Task AddStepAsync(Trip trip, Step entity);
 
     /// <summary>
-    /// Add a step to a trip befor a step
+    /// Add a step to a trip before a step
     /// </summary>
     /// <param name="trip">trip where add step</param>
     /// <param name="nextStep">step where add new step</param>
@@ -35,8 +34,35 @@ public interface IStepPlatform
     /// <returns>step if exist or null</returns>
     Task<Step?> GetStepByIdAsync(Guid stepId);
 
-    Task<Step?> GetStepByTripIdAndStepNumberAsync(Guid tripId, int stepNumber);
-    Task<ICollection<Step>> GetStepsByTripIdAsync(Guid tripId);
-    Task<Step?> UpdateStepAsync(Guid stepId, AddStepDto addStepDto);
-    Task<bool> DeleteStepAsync(Guid stepId);
+    /// <summary>
+    /// Move a step to the end of the trip
+    /// </summary>
+    /// <param name="step">step to move</param>
+    Task MoveStepToEndAsync(Step step);
+
+    /// <summary>
+    /// Move a step before another step
+    /// </summary>
+    /// <param name="step">step to move</param>
+    /// <param name="previousStep">step where to move</param>
+    Task MoveStepBeforeAsync(Step step, Step previousStep);
+
+    /// <summary>
+    /// Move a step after another step
+    /// </summary>
+    /// <param name="step">step to move</param>
+    /// <param name="nextStep">step where to move</param>
+    Task MoveStepAfterAsync(Step step, Step nextStep);
+
+    /// <summary>
+    /// Delete a step
+    /// </summary>
+    void DeleteStep(Step step);
+
+    /// <summary>
+    /// Check if a step exist by id
+    /// </summary>
+    /// <param name="stepId">Id of step to check</param>
+    /// <returns>true if exist or false</returns>
+    Task<bool> IsStepExistById(Guid stepId);
 }

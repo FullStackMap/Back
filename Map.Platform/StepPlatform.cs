@@ -1,5 +1,4 @@
 ﻿using Map.Domain.Entities;
-using Map.Domain.Models.Step;
 using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
 
@@ -21,21 +20,21 @@ public class StepPlatform : IStepPlatform
     /// <inheritdoc/>
     public async Task AddStepAsync(Trip trip, Step entity)
     {
-        await _unitOfWork.Step.AddStepLast(trip, entity);
+        await _unitOfWork.Step.AddStepLastAsync(trip, entity);
         await _unitOfWork.CompleteAsync();
     }
 
     /// <inheritdoc/>
     public async Task AddStepBeforAsync(Trip trip, Step nextStep, Step entity)
     {
-        await _unitOfWork.Step.AddStepBefor(trip, nextStep, entity);
+        await _unitOfWork.Step.AddStepBeforAsync(trip, nextStep, entity);
         await _unitOfWork.CompleteAsync();
     }
 
     /// <inheritdoc/>
     public async Task AddStepAfterAsync(Trip trip, Step previousStep, Step entity)
     {
-        await _unitOfWork.Step.AddStepAfter(trip, previousStep, entity);
+        await _unitOfWork.Step.AddStepAfterAsync(trip, previousStep, entity);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -45,8 +44,18 @@ public class StepPlatform : IStepPlatform
         return await _unitOfWork.Step.GetByIdAsync(stepId);
     }
 
-    public Task<bool> DeleteStepAsync(Guid stepId) => throw new NotImplementedException();
-    public Task<Step?> GetStepByTripIdAndStepNumberAsync(Guid tripId, int stepNumber) => throw new NotImplementedException();
-    public Task<ICollection<Step>> GetStepsByTripIdAsync(Guid tripId) => throw new NotImplementedException();
-    public Task<Step?> UpdateStepAsync(Guid stepId, AddStepDto addStepDto) => throw new NotImplementedException();
+    /// <inheritdoc/>
+    public async Task MoveStepToEndAsync(Step step) => await _unitOfWork.Step.MoveStepToEndAsync(step);
+
+    /// <inheritdoc/>
+    public async Task MoveStepBeforeAsync(Step step, Step previousStep) => await _unitOfWork.Step.MoveStepBeforeAsync(step, previousStep);
+
+    /// <inheritdoc/>
+    public async Task MoveStepAfterAsync(Step step, Step nextStep) => await _unitOfWork.Step.MoveStepAfterAsync(step, nextStep);
+
+    /// <inheritdoc/>
+    public async Task<bool> IsStepExistById(Guid stepId) => await _unitOfWork.Step.IsExistAsync(stepId);
+
+    /// <inheritdoc/>
+    public void DeleteStep(Step step) => _unitOfWork.Step.Remove(step);
 }

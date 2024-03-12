@@ -10,4 +10,7 @@ public enum EStepErrorCodes
     NameMinLength = 306,
     NameMaxLength = 307,
     StepNotFoundById = 308,
+    StepNotDeleted = 309,
+    StepsNotInSameTrip = 310,
+    StepNumberNotInOrder = 311,
 }

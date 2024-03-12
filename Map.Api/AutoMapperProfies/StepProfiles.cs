@@ -10,5 +10,6 @@ public class StepProfiles : Profile
     {
         CreateMap<AddStepDto, Step>();
         CreateMap<Step, StepDto>();
+        CreateMap<Step, StepDtoList>();
     }
 }
