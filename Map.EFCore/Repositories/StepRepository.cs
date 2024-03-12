@@ -114,4 +114,27 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
 
         return _context.SaveChangesAsync();
     }
+
+    /// <inheritdoc/>
+    public Task RemoveStepAsync(Step step)
+    {
+        Trip trip = step.Trip;
+        int stepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == step.StepId);
+
+        if (stepIndex is -1)
+            throw new ArgumentException($"L'étape : {step},  n'as pas été trouver dans le trip : {trip}");
+
+        for (int i = stepIndex + 1; i < trip.Steps.Count; i++)
+            trip.Steps[i].StepNumber--;
+
+        _context.Step.Remove(step);
+        return _context.SaveChangesAsync();
+    }
+
+    /// <inheritdoc/>
+    public Task UpdateStepAsync(Step step)
+    {
+        _context.Step.Update(step);
+        return _context.SaveChangesAsync();
+    }
 }

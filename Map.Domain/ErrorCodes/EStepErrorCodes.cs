@@ -13,4 +13,6 @@ public enum EStepErrorCodes
     StepNotDeleted = 309,
     StepsNotInSameTrip = 310,
     StepNumberNotInOrder = 311,
+    EndDateNotEmpty = 312,
+    StartDateNotEmpty = 313,
 }

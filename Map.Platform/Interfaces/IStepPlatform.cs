@@ -1,4 +1,5 @@
 ﻿using Map.Domain.Entities;
+using Map.Domain.Models.Step;
 
 namespace Map.Platform.Interfaces;
 public interface IStepPlatform
@@ -57,7 +58,7 @@ public interface IStepPlatform
     /// <summary>
     /// Delete a step
     /// </summary>
-    void DeleteStep(Step step);
+    Task DeleteStepAsync(Step step);
 
     /// <summary>
     /// Check if a step exist by id
@@ -65,4 +66,8 @@ public interface IStepPlatform
     /// <param name="stepId">Id of step to check</param>
     /// <returns>true if exist or false</returns>
     Task<bool> IsStepExistById(Guid stepId);
+    Task UpdateStepNameAsync(Step step, UpdateStepNameDto updateStepNameDto);
+    Task UpdateStepDescAsync(Step step, UpdateStepDescriptionDto updateStepDescriptionDto);
+    Task UpdateStepDateAsync(Step step, UpdateStepDateDto updateStepDateDto);
+    Task UpdateStepLocationAsync(Step step, UpdateStepLocationDto updateStepLocationDto);
 }

@@ -45,4 +45,16 @@ public interface IStepRepository : IGenericRepository<Step>
     /// <param name="step">step to move</param>
     /// <param name="nextStep">step where to move</param>
     Task MoveStepAfterAsync(Step step, Step nextStep);
+
+    /// <summary>
+    /// Remove Step number from step list
+    /// </summary>
+    /// <param name="step">step to remove</param>
+    Task RemoveStepAsync(Step step);
+
+    /// <summary>
+    /// Update a step
+    /// </summary>
+    /// <param name="step">step to update</param>
+    Task UpdateStepAsync(Step step);
 }

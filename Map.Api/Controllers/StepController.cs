@@ -21,18 +21,33 @@ public class StepController : ControllerBase
     #region Props
     private readonly IMapper _mapper;
     private readonly IValidator<AddStepDto> _addStepValidator;
+    private readonly IValidator<UpdateStepNameDto> _updateStepNameValidator;
+    private readonly IValidator<UpdateStepDescriptionDto> _updateStepDescriptionValidator;
+    private readonly IValidator<UpdateStepDateDto> _updateStepDateValidator;
+    private readonly IValidator<UpdateStepLocationDto> _updateStepLocationValidator;
     private readonly ITripPlatform _tripPlatform;
     private readonly IStepPlatform _stepPlatform;
 
     #endregion
 
     #region Ctor
-    public StepController(IMapper mapper, IValidator<AddStepDto> addStepValidator, ITripPlatform tripPlatform, IStepPlatform stepPlatform)
+    public StepController(IMapper mapper,
+                          IValidator<AddStepDto> addStepValidator,
+                          ITripPlatform tripPlatform,
+                          IStepPlatform stepPlatform,
+                          IValidator<UpdateStepDescriptionDto> updateStepDescriptionValidator,
+                          IValidator<UpdateStepDateDto> updateStepDateValidator,
+                          IValidator<UpdateStepLocationDto> updateStepLocationValidator,
+                          IValidator<UpdateStepNameDto> updateStepNameValidator)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _addStepValidator = addStepValidator ?? throw new ArgumentNullException(nameof(addStepValidator));
         _tripPlatform = tripPlatform ?? throw new ArgumentNullException(nameof(tripPlatform));
         _stepPlatform = stepPlatform ?? throw new ArgumentNullException(nameof(stepPlatform));
+        _updateStepNameValidator = updateStepNameValidator ?? throw new ArgumentNullException(nameof(updateStepNameValidator));
+        _updateStepDescriptionValidator = updateStepDescriptionValidator ?? throw new ArgumentNullException(nameof(updateStepDescriptionValidator));
+        _updateStepDateValidator = updateStepDateValidator ?? throw new ArgumentNullException(nameof(updateStepDateValidator));
+        _updateStepLocationValidator = updateStepLocationValidator ?? throw new ArgumentNullException(nameof(updateStepLocationValidator));
     }
     #endregion
 
@@ -255,6 +270,12 @@ public class StepController : ControllerBase
         return _mapper.Map<Step, StepDto>(step);
     }
 
+    /// <summary>
+    /// Move a step after another step
+    /// </summary>
+    /// <param name="stepId">Id of the step to move</param>
+    /// <param name="nextStepId">Id of the step after where to move</param>
+    /// <returns>Step</returns>
     [HttpPatch]
     [Route("{stepId}/move-after-{nextStepId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
@@ -287,6 +308,132 @@ public class StepController : ControllerBase
 
     #endregion
 
+    #region Update - One field
+    /// <summary>
+    /// Update step name
+    /// </summary>
+    /// <param name="stepId">Id of wanted Step</param>
+    /// <param name="updateStepNameDto">updateStepNameDto</param>
+    /// <returns>Step</returns>
+    [HttpPatch]
+    [Route("{stepId}/name")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(StepDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<StepDto>> UpdateStepNameAsync([FromRoute] Guid stepId, [FromBody] UpdateStepNameDto updateStepNameDto)
+    {
+        ValidationResult validationResult = _updateStepNameValidator.Validate(updateStepNameDto);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        if (step is null)
+            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
+
+        await _stepPlatform.UpdateStepNameAsync(step, updateStepNameDto);
+
+        return _mapper.Map<Step, StepDto>(step);
+    }
+
+    /// <summary>
+    /// Update step description
+    /// </summary>
+    /// <param name="stepId">Id of wanted Step</param>
+    /// <param name="updateStepDescriptionDto">updateStepDescriptionDto</param>
+    [HttpPatch]
+    [Route("{stepId}/description")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(StepDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<StepDto>> UpdateStepDescriptionAsync([FromRoute] Guid stepId, [FromBody] UpdateStepDescriptionDto updateStepDescriptionDto)
+    {
+        ValidationResult validationResult = _updateStepDescriptionValidator.Validate(updateStepDescriptionDto);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        if (step is null)
+            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
+
+        await _stepPlatform.UpdateStepDescAsync(step, updateStepDescriptionDto);
+
+        return _mapper.Map<Step, StepDto>(step);
+    }
+
+    /// <summary>
+    /// Update step date
+    /// </summary>
+    /// <param name="stepId">Id of wanted Step</param>
+    /// <param name="updateStepDateDto">updateStepDateDto</param>
+    /// <returns>Step</returns>
+    [HttpPatch]
+    [Route("{stepId}/date")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(StepDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<StepDto>> UpdateStepDateAsync([FromRoute] Guid stepId, [FromBody] UpdateStepDateDto updateStepDateDto)
+    {
+        ValidationResult validationResult = _updateStepDateValidator.Validate(updateStepDateDto);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        if (step is null)
+            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
+
+        await _stepPlatform.UpdateStepDateAsync(step, updateStepDateDto);
+
+        return _mapper.Map<Step, StepDto>(step);
+    }
+
+    /// <summary>
+    /// Update step location
+    /// </summary>
+    /// <param name="stepId">Id of wanted Step</param>
+    /// <param name="updateStepLocationDto">updateStepLocationDto</param>
+    /// <returns>Step</returns>
+    [HttpPatch]
+    [Route("{stepId}/location")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(StepDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<StepDto>> UpdateStepLocationAsync([FromRoute] Guid stepId, [FromBody] UpdateStepLocationDto updateStepLocationDto)
+    {
+        ValidationResult validationResult = _updateStepLocationValidator.Validate(updateStepLocationDto);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        if (step is null)
+            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
+
+        await _stepPlatform.UpdateStepLocationAsync(step, updateStepLocationDto);
+
+        return _mapper.Map<Step, StepDto>(step);
+    }
+
+    #endregion
+
     #region Delete
     /// <summary>
     /// Delete a step by id
@@ -307,8 +454,7 @@ public class StepController : ControllerBase
         if (entity is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
-        _stepPlatform.DeleteStep(entity);
-
+        await _stepPlatform.DeleteStepAsync(entity);
         return NoContent();
     }
     #endregion

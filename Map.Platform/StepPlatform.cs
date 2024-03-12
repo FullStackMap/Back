@@ -1,4 +1,5 @@
 ﻿using Map.Domain.Entities;
+using Map.Domain.Models.Step;
 using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
 
@@ -57,5 +58,43 @@ public class StepPlatform : IStepPlatform
     public async Task<bool> IsStepExistById(Guid stepId) => await _unitOfWork.Step.IsExistAsync(stepId);
 
     /// <inheritdoc/>
-    public void DeleteStep(Step step) => _unitOfWork.Step.Remove(step);
+    public async Task DeleteStepAsync(Step step)
+    {
+        await _unitOfWork.Step.RemoveStepAsync(step);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateStepNameAsync(Step step, UpdateStepNameDto updateStepNameDto)
+    {
+        step.Name = updateStepNameDto.Name;
+        await _unitOfWork.Step.UpdateStepAsync(step);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateStepDescAsync(Step step, UpdateStepDescriptionDto updateStepDescriptionDto)
+    {
+        step.Description = updateStepDescriptionDto.Description;
+        await _unitOfWork.Step.UpdateStepAsync(step);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateStepDateAsync(Step step, UpdateStepDateDto updateStepDateDto)
+    {
+        step.StartDate = updateStepDateDto.StartDate;
+        step.EndDate = updateStepDateDto.EndDate;
+        await _unitOfWork.Step.UpdateStepAsync(step);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateStepLocationAsync(Step step, UpdateStepLocationDto updateStepLocationDto)
+    {
+        step.Latitude = updateStepLocationDto.Latitude;
+        step.Longitude = updateStepLocationDto.Longitude;
+        await _unitOfWork.Step.UpdateStepAsync(step);
+        await _unitOfWork.CompleteAsync();
+    }
 }
