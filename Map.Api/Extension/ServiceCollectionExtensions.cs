@@ -17,6 +17,7 @@ using Map.Platform.Extensions;
 using Map.Provider.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Minio;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Security.Claims;
 
@@ -96,6 +97,9 @@ public static class ServiceCollectionExtensions
 
         RegisterSettings registerSettings = configuration.GetSection("RegisterSettings").Get<RegisterSettings>() ?? throw new ArgumentNullException(nameof(registerSettings));
         services.AddSingleton(registerSettings);
+
+        MinIoSettings minIoSettings = configuration.GetSection("MinIoSettings").Get<MinIoSettings>() ?? throw new ArgumentNullException(nameof(minIoSettings));
+        services.AddSingleton(minIoSettings);
 
         return services;
     }
@@ -189,5 +193,15 @@ public static class ServiceCollectionExtensions
             options.SubstituteApiVersionInUrl = true;
             options.SubstitutionFormat = "VVV";
         });
+    }
+
+    public static IServiceCollection ConfigureMinIo(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        MinIoSettings minIoSettings = configuration.GetSection("MinIoSettings").Get<MinIoSettings>() ?? throw new ArgumentNullException(nameof(minIoSettings));
+
+        services.AddMinio(configureClient => configureClient
+            .WithEndpoint(minIoSettings.EndPoint)
+            .WithCredentials(minIoSettings.AccessKey, minIoSettings.SecretKey));
+        return services;
     }
 }
