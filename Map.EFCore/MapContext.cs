@@ -12,11 +12,10 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
     public DbSet<MapUser> MapUser { get; set; }
     public DbSet<Trip> Trip { get; set; }
     public DbSet<Step> Step { get; set; }
-    public DbSet<TravelTo> TravelTo { get; set; }
+    public DbSet<Travel> Travel { get; set; }
+    public DbSet<TravelRoad> TravelRoad { get; set; }
     public DbSet<Reservation> Reservation { get; set; }
     public DbSet<Document> Document { get; set; }
-    public DbSet<Coordinate> Coordinates { get; set; }
-    public DbSet<CoordinateStepTravelToAssociation> CoordinateStepTravelToAssociations { get; set; }
 
     #endregion Properties
 
@@ -86,13 +85,8 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             s.Property(s => s.Description).HasMaxLength(500);
             s.Property(s => s.StartDate);
             s.Property(s => s.EndDate);
-            s.Property(s => s.Latitude).IsRequired();
-            s.Property(s => s.Longitude).IsRequired();
-
-            s.HasMany(s => s.TravelsTo)
-                .WithOne(tt => tt.CurrentStep)
-                .HasForeignKey(tt => tt.CurrentStepId)
-                .OnDelete(DeleteBehavior.ClientCascade);
+            s.Property(s => s.Latitude).HasPrecision(18, 12).IsRequired();
+            s.Property(s => s.Longitude).HasPrecision(18, 12).IsRequired();
 
             s.HasMany(s => s.Reservations)
                 .WithOne(r => r.Step)
@@ -100,16 +94,46 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        builder.Entity<TravelTo>(tt =>
+        builder.Entity<Travel>(t =>
         {
-            tt.ToTable("TravelTo");
-            tt.HasKey(tt => tt.TravelToId);
+            t.ToTable("Travels");
+            t.HasKey(t => t.TravelId);
 
-            tt.Property(tt => tt.TransportMode);
-            tt.Property(tt => tt.Distance).IsRequired();
-            tt.Property(tt => tt.Duration);
-            tt.Property(tt => tt.CarbonEmition);
+            t.Property(t => t.TransportMode).IsRequired();
+            t.Property(t => t.Distance).IsRequired();
+            t.Property(t => t.Duration).IsRequired();
+            t.Property(t => t.CarbonEmition);
+            t.Property(t => t.OriginStepId).IsRequired();
+            t.Property(t => t.DestinationStepId).IsRequired();
+
+            t.HasOne(t => t.OriginStep)
+                .WithOne(t => t.TravelBefore)
+                .HasForeignKey<Travel>(t => t.OriginStepId)
+                .OnDelete(DeleteBehavior.Restrict)
+;
+
+            t.HasOne(t => t.DestinationStep)
+                .WithOne(t => t.TravelAfter)
+                .HasForeignKey<Travel>(t => t.DestinationStepId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         });
+
+        builder.Entity<TravelRoad>(tr =>
+        {
+            tr.ToTable("TravelRoads");
+            tr.HasKey(tr => tr.TravelId);
+
+            tr.Property(tr => tr.RoadCoordinates).HasMaxLength(-1).IsRequired();
+
+            tr.HasOne(tr => tr.Travel)
+                .WithOne(tr => tr.TravelRoad)
+                .HasForeignKey<Travel>(t => t.TravelId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+
+
 
         builder.Entity<Reservation>(r =>
         {
@@ -157,36 +181,7 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             d.Property(d => d.Path).IsRequired();
         });
 
-        builder.Entity<Coordinate>(c =>
-        {
-            c.ToTable(name: "Coordinates");
-            c.HasKey(c => c.CoordinateId);
 
-            c.Property(c => c.Index).IsRequired();
-            c.Property(c => c.Latitude).IsRequired();
-            c.Property(c => c.Longitude).IsRequired();
-        });
-
-        builder.Entity<CoordinateStepTravelToAssociation>(csta =>
-        {
-            csta.ToTable(name: "CoordinateStepTravelToAssociations");
-            csta.HasKey(csta => new { csta.CoordinateId, csta.StepId, csta.TravelToId });
-
-            csta.HasOne(csta => csta.Step)
-                    .WithOne(s => s.CoordinateStepTravelToAssociation)
-                    .HasForeignKey<CoordinateStepTravelToAssociation>(csta => csta.StepId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-            csta.HasOne(csta => csta.TravelTo)
-                .WithMany(tt => tt.CoordinateStepTravelToAssociations)
-                .HasForeignKey(csta => csta.TravelToId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            csta.HasOne(csta => csta.Coordinate)
-                .WithOne(c => c.CoordinateStepTravelToAssociation)
-                .HasForeignKey<CoordinateStepTravelToAssociation>(csta => csta.CoordinateId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
     }
 
     #endregion Method

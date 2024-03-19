@@ -14,9 +14,10 @@ public class Step
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
 
-    public virtual IList<TravelTo>? TravelsTo { get; set; }
+    public virtual Travel? TravelBefore { get; set; }
+    public virtual Travel? TravelAfter { get; set; }
+
     public virtual IList<Reservation>? Reservations { get; set; }
 
-    public CoordinateStepTravelToAssociation CoordinateStepTravelToAssociation { get; set; }
 
 }

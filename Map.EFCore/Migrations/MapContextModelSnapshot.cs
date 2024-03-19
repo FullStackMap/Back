@@ -22,50 +22,6 @@ namespace Map.EFCore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Map.Domain.Entities.Coordinate", b =>
-                {
-                    b.Property<Guid>("CoordinateId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Index")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("CoordinateId");
-
-                    b.ToTable("Coordinates", (string)null);
-                });
-
-            modelBuilder.Entity("Map.Domain.Entities.CoordinateStepTravelToAssociation", b =>
-                {
-                    b.Property<Guid>("CoordinateId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("StepId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("TravelToId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CoordinateId", "StepId", "TravelToId");
-
-                    b.HasIndex("CoordinateId")
-                        .IsUnique();
-
-                    b.HasIndex("StepId")
-                        .IsUnique();
-
-                    b.HasIndex("TravelToId");
-
-                    b.ToTable("CoordinateStepTravelToAssociations", (string)null);
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.Document", b =>
                 {
                     b.Property<Guid>("DocumentId")
@@ -262,10 +218,12 @@ namespace Map.EFCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 12)
+                        .HasColumnType("decimal(18,12)");
 
                     b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 12)
+                        .HasColumnType("decimal(18,12)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -287,16 +245,15 @@ namespace Map.EFCore.Migrations
                     b.ToTable("Steps", (string)null);
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.TravelTo", b =>
+            modelBuilder.Entity("Map.Domain.Entities.Travel", b =>
                 {
-                    b.Property<Guid>("TravelToId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("TravelId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CarbonEmition")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("CurrentStepId")
+                    b.Property<Guid>("DestinationStepId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Distance")
@@ -305,19 +262,38 @@ namespace Map.EFCore.Migrations
                     b.Property<decimal>("Duration")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("PreviousStepId")
+                    b.Property<Guid>("OriginStepId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TransportMode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("TravelToId");
+                    b.HasKey("TravelId");
 
-                    b.HasIndex("CurrentStepId");
+                    b.HasIndex("DestinationStepId")
+                        .IsUnique();
 
-                    b.HasIndex("PreviousStepId");
+                    b.HasIndex("OriginStepId")
+                        .IsUnique();
 
-                    b.ToTable("TravelTo", (string)null);
+                    b.ToTable("Travels", (string)null);
+                });
+
+            modelBuilder.Entity("Map.Domain.Entities.TravelRoad", b =>
+                {
+                    b.Property<Guid>("TravelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoadCoordinates")
+                        .IsRequired()
+                        .HasMaxLength(-1)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TravelId");
+
+                    b.ToTable("TravelRoads", (string)null);
                 });
 
             modelBuilder.Entity("Map.Domain.Entities.Trip", b =>
@@ -485,33 +461,6 @@ namespace Map.EFCore.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.CoordinateStepTravelToAssociation", b =>
-                {
-                    b.HasOne("Map.Domain.Entities.Coordinate", "Coordinate")
-                        .WithOne("CoordinateStepTravelToAssociation")
-                        .HasForeignKey("Map.Domain.Entities.CoordinateStepTravelToAssociation", "CoordinateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Map.Domain.Entities.Step", "Step")
-                        .WithOne("CoordinateStepTravelToAssociation")
-                        .HasForeignKey("Map.Domain.Entities.CoordinateStepTravelToAssociation", "StepId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Map.Domain.Entities.TravelTo", "TravelTo")
-                        .WithMany("CoordinateStepTravelToAssociations")
-                        .HasForeignKey("TravelToId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Coordinate");
-
-                    b.Navigation("Step");
-
-                    b.Navigation("TravelTo");
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.Document", b =>
                 {
                     b.HasOne("Map.Domain.Entities.Reservation", "Reservation")
@@ -545,23 +494,31 @@ namespace Map.EFCore.Migrations
                     b.Navigation("Trip");
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.TravelTo", b =>
+            modelBuilder.Entity("Map.Domain.Entities.Travel", b =>
                 {
-                    b.HasOne("Map.Domain.Entities.Step", "CurrentStep")
-                        .WithMany("TravelsTo")
-                        .HasForeignKey("CurrentStepId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                    b.HasOne("Map.Domain.Entities.Step", "DestinationStep")
+                        .WithOne("TravelAfter")
+                        .HasForeignKey("Map.Domain.Entities.Travel", "DestinationStepId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Map.Domain.Entities.Step", "PreviousStep")
-                        .WithMany()
-                        .HasForeignKey("PreviousStepId")
+                    b.HasOne("Map.Domain.Entities.Step", "OriginStep")
+                        .WithOne("TravelBefore")
+                        .HasForeignKey("Map.Domain.Entities.Travel", "OriginStepId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Map.Domain.Entities.TravelRoad", "TravelRoad")
+                        .WithOne("Travel")
+                        .HasForeignKey("Map.Domain.Entities.Travel", "TravelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CurrentStep");
+                    b.Navigation("DestinationStep");
 
-                    b.Navigation("PreviousStep");
+                    b.Navigation("OriginStep");
+
+                    b.Navigation("TravelRoad");
                 });
 
             modelBuilder.Entity("Map.Domain.Entities.Trip", b =>
@@ -626,12 +583,6 @@ namespace Map.EFCore.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.Coordinate", b =>
-                {
-                    b.Navigation("CoordinateStepTravelToAssociation")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.MapUser", b =>
                 {
                     b.Navigation("Trips");
@@ -644,17 +595,16 @@ namespace Map.EFCore.Migrations
 
             modelBuilder.Entity("Map.Domain.Entities.Step", b =>
                 {
-                    b.Navigation("CoordinateStepTravelToAssociation")
-                        .IsRequired();
-
                     b.Navigation("Reservations");
 
-                    b.Navigation("TravelsTo");
+                    b.Navigation("TravelAfter");
+
+                    b.Navigation("TravelBefore");
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.TravelTo", b =>
+            modelBuilder.Entity("Map.Domain.Entities.TravelRoad", b =>
                 {
-                    b.Navigation("CoordinateStepTravelToAssociations");
+                    b.Navigation("Travel");
                 });
 
             modelBuilder.Entity("Map.Domain.Entities.Trip", b =>
