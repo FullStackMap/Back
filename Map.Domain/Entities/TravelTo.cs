@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Map.Domain.Entities;
+﻿namespace Map.Domain.Entities;
 
 public class TravelTo
 {
@@ -15,8 +9,9 @@ public class TravelTo
     public virtual Step? CurrentStep { get; set; }
     public string? TransportMode { get; set; }
 
-    //public virtual IList<WayPath>? WayPaths { get; set; }
     public decimal Distance { get; set; }
-    public decimal? Price { get; set; }
+    public decimal Duration { get; set; }
     public int? CarbonEmition { get; set; }
+
+    public IList<CoordinateStepTravelToAssociation> CoordinateStepTravelToAssociations { get; set; }
 }

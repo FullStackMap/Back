@@ -15,7 +15,8 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
     public DbSet<TravelTo> TravelTo { get; set; }
     public DbSet<Reservation> Reservation { get; set; }
     public DbSet<Document> Document { get; set; }
-
+    public DbSet<Coordinate> Coordinates { get; set; }
+    public DbSet<CoordinateStepTravelToAssociation> CoordinateStepTravelToAssociations { get; set; }
 
     #endregion Properties
 
@@ -88,11 +89,6 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             s.Property(s => s.Latitude).IsRequired();
             s.Property(s => s.Longitude).IsRequired();
 
-            //TODO: Add type table
-            //s.HasMany(s => s.Type)
-            //    .WithMany()
-            //    .UsingEntity(j => j.ToTable("StepTypes"));
-
             s.HasMany(s => s.TravelsTo)
                 .WithOne(tt => tt.CurrentStep)
                 .HasForeignKey(tt => tt.CurrentStepId)
@@ -111,9 +107,8 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
 
             tt.Property(tt => tt.TransportMode);
             tt.Property(tt => tt.Distance).IsRequired();
-            tt.Property(tt => tt.Price);
+            tt.Property(tt => tt.Duration);
             tt.Property(tt => tt.CarbonEmition);
-
         });
 
         builder.Entity<Reservation>(r =>
@@ -160,6 +155,37 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
 
             d.Property(d => d.Name).IsRequired();
             d.Property(d => d.Path).IsRequired();
+        });
+
+        builder.Entity<Coordinate>(c =>
+        {
+            c.ToTable(name: "Coordinates");
+            c.HasKey(c => c.CoordinateId);
+
+            c.Property(c => c.Index).IsRequired();
+            c.Property(c => c.Latitude).IsRequired();
+            c.Property(c => c.Longitude).IsRequired();
+        });
+
+        builder.Entity<CoordinateStepTravelToAssociation>(csta =>
+        {
+            csta.ToTable(name: "CoordinateStepTravelToAssociations");
+            csta.HasKey(csta => new { csta.CoordinateId, csta.StepId, csta.TravelToId });
+
+            csta.HasOne(csta => csta.Step)
+                    .WithOne(s => s.CoordinateStepTravelToAssociation)
+                    .HasForeignKey<CoordinateStepTravelToAssociation>(csta => csta.StepId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            csta.HasOne(csta => csta.TravelTo)
+                .WithMany(tt => tt.CoordinateStepTravelToAssociations)
+                .HasForeignKey(csta => csta.TravelToId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            csta.HasOne(csta => csta.Coordinate)
+                .WithOne(c => c.CoordinateStepTravelToAssociation)
+                .HasForeignKey<CoordinateStepTravelToAssociation>(csta => csta.CoordinateId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
