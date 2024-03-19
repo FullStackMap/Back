@@ -29,6 +29,8 @@ builder.Services.AddAutoMapperConfiguration();
 
 WebApplication app = builder.Build();
 
+app.Services.SaveSwaggerJson();
+
 app.Services.ConfigureDatabase();
 
 bool displaySwagger = builder.Configuration.GetValue<bool>("DisplaySwagger");
