@@ -103,25 +103,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<StepDto>> AddStepBeforAsync([FromRoute] Guid tripId, [FromRoute] Guid stepId, [FromBody] AddStepDto addStepDto)
     {
-        ValidationResult validationResult = _addStepValidator.Validate(addStepDto);
-
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
-        }
-
-        Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
-        if (trip is null)
-            return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Voyage non trouvé par id"));
-
-        Step? nextStep = trip.Steps.FirstOrDefault(s => s.StepId == stepId);
-        if (nextStep is null)
-            return NotFound(new Error(ETripErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        Step entity = _mapper.Map<AddStepDto, Step>(addStepDto);
-        await _stepPlatform.AddStepBeforAsync(trip, nextStep, entity);
-
-        return CreatedAtAction(nameof(GetStepByIdAsync), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -141,25 +123,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<StepDto>> AddStepAfterAsync([FromRoute] Guid tripId, [FromRoute] Guid stepId, [FromBody] AddStepDto addStepDto)
     {
-        ValidationResult validationResult = _addStepValidator.Validate(addStepDto);
-
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
-        }
-
-        Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
-        if (trip is null)
-            return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Voyage non trouvé par id"));
-
-        Step? previousStep = trip.Steps.FirstOrDefault(s => s.StepId == stepId);
-        if (previousStep is null)
-            return NotFound(new Error(ETripErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        Step entity = _mapper.Map<AddStepDto, Step>(addStepDto);
-        await _stepPlatform.AddStepAfterAsync(trip, previousStep, entity);
-
-        return CreatedAtAction(nameof(GetStepByIdAsync), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
+        throw new NotImplementedException();
     }
     #endregion
 
@@ -178,11 +142,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<StepDto>> GetStepByIdAsync([FromRoute] Guid stepId)
     {
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
-        if (step is null)
-            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        return _mapper.Map<Step, StepDto>(step);
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -200,11 +160,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ICollection<StepDtoList>>> GetStepsByTripIdAsync([FromRoute] Guid tripId)
     {
-        Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
-        if (trip is null)
-            return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Voyage non trouvé par id"));
-
-        return Ok(_mapper.Map<ICollection<Step>, ICollection<StepDtoList>>(trip.Steps));
+        throw new NotImplementedException();
     }
     #endregion
 
@@ -225,13 +181,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<StepDto>> MoveStepToEndAsync([FromRoute] Guid stepId)
     {
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
-        if (step is null)
-            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        await _stepPlatform.MoveStepToEndAsync(step);
-
-        return _mapper.Map<Step, StepDto>(step);
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -251,23 +201,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<StepDto>> MoveStepBefore([FromRoute] Guid stepId, [FromRoute] Guid previousStepId)
     {
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
-        if (step is null)
-            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        Step? previousStep = await _stepPlatform.GetStepByIdAsync(previousStepId);
-        if (previousStep is null)
-            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        if (previousStep.TripId != step.TripId)
-            return BadRequest(new Error(EStepErrorCodes.StepsNotInSameTrip.ToStringValue(), "Les étapes fournies ne sont pas dans le même voyage"));
-
-        if (previousStep.StepNumber < step.StepNumber)
-            return BadRequest(new Error(EStepErrorCodes.StepNumberNotInOrder.ToStringValue(), "L'étape suivante doit être après l'étape actuelle"));
-
-        await _stepPlatform.MoveStepBeforeAsync(step, previousStep);
-
-        return _mapper.Map<Step, StepDto>(step);
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -287,23 +221,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<StepDto>> MoveStepAfter([FromRoute] Guid stepId, [FromRoute] Guid nextStepId)
     {
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
-        if (step is null)
-            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        Step? nextStep = await _stepPlatform.GetStepByIdAsync(nextStepId);
-        if (nextStep is null)
-            return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
-
-        if (nextStep.TripId != step.TripId)
-            return BadRequest(new Error(EStepErrorCodes.StepsNotInSameTrip.ToStringValue(), "Les étapes fournies ne sont pas dans le même voyage"));
-
-        if (nextStep.StepNumber > step.StepNumber)
-            return BadRequest(new Error(EStepErrorCodes.StepNumberNotInOrder.ToStringValue(), "L'étape suivante doit être après l'étape actuelle"));
-
-        await _stepPlatform.MoveStepAfterAsync(step, nextStep);
-
-        return _mapper.Map<Step, StepDto>(step);
+        throw new NotImplementedException();
     }
 
     #endregion

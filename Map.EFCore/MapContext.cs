@@ -14,8 +14,6 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
     public DbSet<Step> Step { get; set; }
     public DbSet<Travel> Travel { get; set; }
     public DbSet<TravelRoad> TravelRoad { get; set; }
-    public DbSet<Reservation> Reservation { get; set; }
-    public DbSet<Document> Document { get; set; }
 
     #endregion Properties
 
@@ -50,11 +48,6 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             u.Property(u => u.Email).IsRequired();
             u.Property(u => u.NormalizedEmail).IsRequired();
 
-            u.HasMany(u => u.Trips)
-                .WithOne(t => t.User)
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
         });
 
         builder.Entity<Trip>(t =>
@@ -62,11 +55,18 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             t.ToTable(name: "Trips");
             t.HasKey(t => t.TripId);
 
+            t.Property(t => t.UserId).IsRequired();
             t.Property(t => t.Name).IsRequired();
-            t.Property(t => t.Description).HasMaxLength(500);
             t.Property(t => t.StartDate).IsRequired();
             t.Property(t => t.EndDate).IsRequired();
             t.Property(t => t.BackgroundPicturePath).IsRequired();
+
+            t.Property(t => t.Description).IsRequired(false).HasMaxLength(500);
+
+            t.HasOne(t => t.User)
+                .WithMany(u => u.Trips)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             t.HasMany(t => t.Steps)
                 .WithOne(s => s.Trip)
@@ -79,18 +79,18 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             s.ToTable(name: "Steps");
             s.HasKey(s => s.StepId);
 
-            s.Property(s => s.StepNumber).IsRequired();
             s.Property(s => s.TripId).IsRequired();
             s.Property(s => s.Name).IsRequired();
-            s.Property(s => s.Description).HasMaxLength(500);
-            s.Property(s => s.StartDate);
-            s.Property(s => s.EndDate);
             s.Property(s => s.Latitude).HasPrecision(18, 12).IsRequired();
             s.Property(s => s.Longitude).HasPrecision(18, 12).IsRequired();
 
-            s.HasMany(s => s.Reservations)
-                .WithOne(r => r.Step)
-                .HasForeignKey(r => r.StepId)
+            s.Property(s => s.Description).HasMaxLength(500);
+            s.Property(s => s.StartDate).IsRequired(false);
+            s.Property(s => s.EndDate).IsRequired(false);
+
+            s.HasOne(s => s.Trip)
+                .WithMany(t => t.Steps)
+                .HasForeignKey(s => s.TripId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -99,12 +99,11 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             t.ToTable("Travels");
             t.HasKey(t => t.TravelId);
 
-            t.Property(t => t.TransportMode).IsRequired();
-            t.Property(t => t.Distance).IsRequired();
-            t.Property(t => t.Duration).IsRequired();
-            t.Property(t => t.CarbonEmition);
             t.Property(t => t.OriginStepId).IsRequired();
             t.Property(t => t.DestinationStepId).IsRequired();
+            t.Property(t => t.TransportMode).IsRequired();
+            t.Property(t => t.Distance).HasPrecision(18, 12).IsRequired();
+            t.Property(t => t.Duration).HasPrecision(18, 12).IsRequired();
 
             t.HasOne(t => t.OriginStep)
                 .WithOne(t => t.TravelBefore)
@@ -131,56 +130,6 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
                 .HasForeignKey<Travel>(t => t.TravelId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-
-
-
-
-        builder.Entity<Reservation>(r =>
-        {
-            r.ToTable("Reservations");
-            r.HasKey(r => r.ReservationId);
-
-            r.Property(r => r.Name).IsRequired();
-            r.Property(r => r.CompanieName);
-            r.Property(r => r.IsReservated).IsRequired();
-            r.Property(r => r.TransportNumber);
-            r.Property(r => r.PlaceCount);
-            r.Property(r => r.Terminal);
-            r.Property(r => r.TerminaleGate);
-            r.Property(r => r.VehiculeType);
-            r.Property(r => r.StartTime).IsRequired();
-            r.Property(r => r.EndTime);
-            r.Property(r => r.StartTimeGMT);
-            r.Property(r => r.EndTimeGMT);
-            r.Property(r => r.StartLatitude);
-            r.Property(r => r.StartLongitude);
-            r.Property(r => r.EndLatitude);
-            r.Property(r => r.EndLongitude);
-            r.Property(r => r.Note);
-            r.Property(r => r.Price);
-            r.Property(r => r.Currency);
-            r.Property(r => r.ReservationNumber);
-            r.Property(r => r.ReservationLastName);
-            r.Property(r => r.ReservationUrl);
-            r.Property(r => r.ReservationPhoneNumber);
-            r.Property(r => r.ReservationEmail);
-
-            r.HasMany(r => r.Documents)
-                .WithOne(d => d.Reservation)
-                .HasForeignKey(d => d.ReservationId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-
-        builder.Entity<Document>(d =>
-        {
-            d.ToTable(name: "Documents");
-            d.HasKey(d => d.DocumentId);
-
-            d.Property(d => d.Name).IsRequired();
-            d.Property(d => d.Path).IsRequired();
-        });
-
 
     }
 

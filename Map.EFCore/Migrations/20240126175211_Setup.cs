@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -178,120 +177,6 @@ namespace Map.EFCore.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Steps",
-                columns: table => new
-                {
-                    StepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TripId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Steps", x => x.StepId);
-                    table.ForeignKey(
-                        name: "FK_Steps_Trips_TripId",
-                        column: x => x.TripId,
-                        principalTable: "Trips",
-                        principalColumn: "TripId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Reservations",
-                columns: table => new
-                {
-                    ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CompanieName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsReservated = table.Column<bool>(type: "bit", nullable: false),
-                    TransportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PlaceCount = table.Column<int>(type: "int", nullable: true),
-                    Terminal = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TerminaleGate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehiculeType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    StartTimeGMT = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EndTimeGMT = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartLatitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    StartLongitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    EndLatitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    EndLongitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReservationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReservationLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReservationUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReservationPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReservationEmail = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reservations", x => x.ReservationId);
-                    table.ForeignKey(
-                        name: "FK_Reservations_Steps_StepId",
-                        column: x => x.StepId,
-                        principalTable: "Steps",
-                        principalColumn: "StepId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TravelTo",
-                columns: table => new
-                {
-                    TravelToId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PreviousStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CurrentStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransportMode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Distance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CarbonEmition = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TravelTo", x => x.TravelToId);
-                    table.ForeignKey(
-                        name: "FK_TravelTo_Steps_CurrentStepId",
-                        column: x => x.CurrentStepId,
-                        principalTable: "Steps",
-                        principalColumn: "StepId");
-                    table.ForeignKey(
-                        name: "FK_TravelTo_Steps_PreviousStepId",
-                        column: x => x.PreviousStepId,
-                        principalTable: "Steps",
-                        principalColumn: "StepId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Documents",
-                columns: table => new
-                {
-                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Documents", x => x.DocumentId);
-                    table.ForeignKey(
-                        name: "FK_Documents_Reservations_ReservationId",
-                        column: x => x.ReservationId,
-                        principalTable: "Reservations",
-                        principalColumn: "ReservationId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -320,11 +205,6 @@ namespace Map.EFCore.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Documents_ReservationId",
-                table: "Documents",
-                column: "ReservationId");
-
-            migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "MapUsers",
                 column: "NormalizedEmail");
@@ -334,26 +214,6 @@ namespace Map.EFCore.Migrations
                 table: "MapUsers",
                 column: "NormalizedUserName",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservations_StepId",
-                table: "Reservations",
-                column: "StepId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Steps_TripId",
-                table: "Steps",
-                column: "TripId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TravelTo_CurrentStepId",
-                table: "TravelTo",
-                column: "CurrentStepId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TravelTo_PreviousStepId",
-                table: "TravelTo",
-                column: "PreviousStepId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trips_UserId",
@@ -380,19 +240,7 @@ namespace Map.EFCore.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Documents");
-
-            migrationBuilder.DropTable(
-                name: "TravelTo");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "Reservations");
-
-            migrationBuilder.DropTable(
-                name: "Steps");
 
             migrationBuilder.DropTable(
                 name: "Trips");

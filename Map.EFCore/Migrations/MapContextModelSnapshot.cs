@@ -22,30 +22,6 @@ namespace Map.EFCore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Map.Domain.Entities.Document", b =>
-                {
-                    b.Property<Guid>("DocumentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ReservationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("DocumentId");
-
-                    b.HasIndex("ReservationId");
-
-                    b.ToTable("Documents", (string)null);
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.MapUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -115,100 +91,13 @@ namespace Map.EFCore.Migrations
                     b.ToTable("MapUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.Reservation", b =>
-                {
-                    b.Property<Guid>("ReservationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CompanieName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("EndLatitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("EndLongitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EndTimeGMT")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsReservated")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PlaceCount")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ReservationEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReservationLastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReservationNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReservationPhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReservationUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("StartLatitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("StartLongitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StartTimeGMT")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("StepId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Terminal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TerminaleGate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TransportNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VehiculeType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ReservationId");
-
-                    b.HasIndex("StepId");
-
-                    b.ToTable("Reservations", (string)null);
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.Step", b =>
                 {
-                    b.Property<Guid>("StepId")
+                    b.Property<int>("StepId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StepId"));
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -232,9 +121,6 @@ namespace Map.EFCore.Migrations
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("StepNumber")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("TripId")
                         .HasColumnType("uniqueidentifier");
 
@@ -247,23 +133,22 @@ namespace Map.EFCore.Migrations
 
             modelBuilder.Entity("Map.Domain.Entities.Travel", b =>
                 {
-                    b.Property<Guid>("TravelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("CarbonEmition")
+                    b.Property<int>("TravelId")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("DestinationStepId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("DestinationStepId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Distance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 12)
+                        .HasColumnType("decimal(18,12)");
 
                     b.Property<decimal>("Duration")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 12)
+                        .HasColumnType("decimal(18,12)");
 
-                    b.Property<Guid>("OriginStepId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("OriginStepId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TransportMode")
                         .IsRequired()
@@ -282,9 +167,11 @@ namespace Map.EFCore.Migrations
 
             modelBuilder.Entity("Map.Domain.Entities.TravelRoad", b =>
                 {
-                    b.Property<Guid>("TravelId")
+                    b.Property<int>("TravelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TravelId"));
 
                     b.Property<string>("RoadCoordinates")
                         .IsRequired()
@@ -461,28 +348,6 @@ namespace Map.EFCore.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.Document", b =>
-                {
-                    b.HasOne("Map.Domain.Entities.Reservation", "Reservation")
-                        .WithMany("Documents")
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reservation");
-                });
-
-            modelBuilder.Entity("Map.Domain.Entities.Reservation", b =>
-                {
-                    b.HasOne("Map.Domain.Entities.Step", "Step")
-                        .WithMany("Reservations")
-                        .HasForeignKey("StepId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Step");
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.Step", b =>
                 {
                     b.HasOne("Map.Domain.Entities.Trip", "Trip")
@@ -588,15 +453,8 @@ namespace Map.EFCore.Migrations
                     b.Navigation("Trips");
                 });
 
-            modelBuilder.Entity("Map.Domain.Entities.Reservation", b =>
-                {
-                    b.Navigation("Documents");
-                });
-
             modelBuilder.Entity("Map.Domain.Entities.Step", b =>
                 {
-                    b.Navigation("Reservations");
-
                     b.Navigation("TravelAfter");
 
                     b.Navigation("TravelBefore");
