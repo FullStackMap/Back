@@ -15,4 +15,5 @@ public enum EStepErrorCodes
     StepNumberNotInOrder = 311,
     EndDateNotEmpty = 312,
     StartDateNotEmpty = 313,
+    OrderNotInOrder = 314,
 }

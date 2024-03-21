@@ -7,6 +7,7 @@ public class Step
     public Guid TripId { get; set; }
     public virtual Trip? Trip { get; set; }
 
+    public int Order { get; set; }
     public string Name { get; set; }
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }

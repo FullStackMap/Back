@@ -67,11 +67,6 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
                 .WithMany(u => u.Trips)
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            t.HasMany(t => t.Steps)
-                .WithOne(s => s.Trip)
-                .HasForeignKey(s => s.TripId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Step>(s =>

@@ -28,6 +28,7 @@ public class StepPlatform : IStepPlatform
     /// <inheritdoc/>
     public async Task AddStepBeforAsync(Trip trip, Step nextStep, Step entity)
     {
+        //TODO: Delete TravelBefore NexStep
         await _unitOfWork.Step.AddStepBeforAsync(trip, nextStep, entity);
         await _unitOfWork.CompleteAsync();
     }
@@ -60,6 +61,7 @@ public class StepPlatform : IStepPlatform
     /// <inheritdoc/>
     public async Task DeleteStepAsync(Step step)
     {
+        //Todo Delete Linked Travel To Step
         await _unitOfWork.Step.RemoveStepAsync(step);
         await _unitOfWork.CompleteAsync();
     }

@@ -66,8 +66,36 @@ public interface IStepPlatform
     /// <param name="stepId">Id of step to check</param>
     /// <returns>true if exist or false</returns>
     Task<bool> IsStepExistById(Guid stepId);
+
+    /// <summary>
+    /// Update a step title
+    /// </summary>
+    /// <param name="step">step to update</param>
+    /// <param name="updateStepNameDto">new title</param>
+    /// <returns>updated step</returns>
     Task UpdateStepNameAsync(Step step, UpdateStepNameDto updateStepNameDto);
+
+    /// <summary>
+    /// Update a step description
+    /// </summary>
+    /// <param name="step">step to update</param>
+    /// <param name="updateStepDescriptionDto">new description</param>
+    /// <returns>updated step</returns>
     Task UpdateStepDescAsync(Step step, UpdateStepDescriptionDto updateStepDescriptionDto);
+
+    /// <summary>
+    /// Update a step date
+    /// </summary>
+    /// <param name="step">step to update</param>
+    /// <param name="updateStepDateDto">new date</param>
+    /// <returns>updated step</returns>
     Task UpdateStepDateAsync(Step step, UpdateStepDateDto updateStepDateDto);
+
+    /// <summary>
+    /// Update a step location
+    /// </summary>
+    /// <param name="step">step to update</param>
+    /// <param name="updateStepLocationDto">new location</param>
+    /// <returns>updated step</returns>
     Task UpdateStepLocationAsync(Step step, UpdateStepLocationDto updateStepLocationDto);
 }
