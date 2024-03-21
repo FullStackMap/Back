@@ -3,6 +3,7 @@
 public class Step
 {
     public int StepId { get; set; }
+
     public Guid TripId { get; set; }
     public virtual Trip? Trip { get; set; }
 

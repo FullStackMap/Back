@@ -3,14 +3,13 @@
 public class Travel
 {
     public int TravelId { get; set; }
-    public int OriginStepId { get; set; }
-    public virtual Step? OriginStep { get; set; }
 
+    public int OriginStepId { get; set; }
     public int DestinationStepId { get; set; }
+    public virtual Step? OriginStep { get; set; }
     public virtual Step? DestinationStep { get; set; }
 
     public string TransportMode { get; set; }
-
     public decimal Distance { get; set; }
     public decimal Duration { get; set; }
 

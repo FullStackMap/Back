@@ -88,10 +88,21 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             s.Property(s => s.StartDate).IsRequired(false);
             s.Property(s => s.EndDate).IsRequired(false);
 
+
             s.HasOne(s => s.Trip)
                 .WithMany(t => t.Steps)
                 .HasForeignKey(s => s.TripId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            s.HasOne(s => s.TravelBefore)
+                .WithOne(t => t.DestinationStep)
+                .HasForeignKey<Travel>(t => t.DestinationStepId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            s.HasOne(s => s.TravelAfter)
+                .WithOne(t => t.OriginStep)
+                .HasForeignKey<Travel>(t => t.OriginStepId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<Travel>(t =>
@@ -106,16 +117,14 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             t.Property(t => t.Duration).HasPrecision(18, 12).IsRequired();
 
             t.HasOne(t => t.OriginStep)
-                .WithOne(t => t.TravelBefore)
-                .HasForeignKey<Travel>(t => t.OriginStepId)
+                .WithOne(s => s.TravelAfter)
+                .HasForeignKey<Travel>(s => s.OriginStepId)
                 .OnDelete(DeleteBehavior.Restrict)
 ;
-
             t.HasOne(t => t.DestinationStep)
-                .WithOne(t => t.TravelAfter)
-                .HasForeignKey<Travel>(t => t.DestinationStepId)
+                .WithOne(s => s.TravelBefore)
+                .HasForeignKey<Travel>(s => s.DestinationStepId)
                 .OnDelete(DeleteBehavior.Restrict);
-
         });
 
         builder.Entity<TravelRoad>(tr =>

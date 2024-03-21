@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
             {
                 if (context.Database.IsRelational())
                 {
-                    context?.Database.Migrate();
+                    //context?.Database.Migrate();
                 }
                 else
                 {
