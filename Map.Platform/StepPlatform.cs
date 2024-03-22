@@ -26,42 +26,58 @@ public class StepPlatform : IStepPlatform
     }
 
     /// <inheritdoc/>
-    public async Task AddStepBeforAsync(Trip trip, Step nextStep, Step entity)
+    public async Task AddStepBeforAsync(Trip trip, Step previousStep, Step entity)
     {
-        //TODO: Delete TravelBefore NexStep
-        await _unitOfWork.Step.AddStepBeforAsync(trip, nextStep, entity);
+        await _unitOfWork.Travel.RemoveTravelBeforeStepAsync(previousStep);
+        await _unitOfWork.Step.AddStepBeforAsync(trip, previousStep, entity);
         await _unitOfWork.CompleteAsync();
     }
 
     /// <inheritdoc/>
-    public async Task AddStepAfterAsync(Trip trip, Step previousStep, Step entity)
+    public async Task AddStepAfterAsync(Trip trip, Step nextStep, Step entity)
     {
-        await _unitOfWork.Step.AddStepAfterAsync(trip, previousStep, entity);
+        await _unitOfWork.Travel.RemoveTravelAfterStepAsync(nextStep);
+        await _unitOfWork.Step.AddStepAfterAsync(trip, nextStep, entity);
         await _unitOfWork.CompleteAsync();
     }
 
     /// <inheritdoc/>
-    public async Task<Step?> GetStepByIdAsync(Guid stepId)
+    public async Task<Step?> GetStepByIdAsync(int stepId) => await _unitOfWork.Step.GetStepByIdAsync(stepId);
+
+    /// <inheritdoc/>
+    public async Task<Step?> GetByStepIdAsync(int stepId) => await _unitOfWork.Step.GetByStepIdAsync(stepId);
+
+    /// <inheritdoc/>
+    public async Task MoveStepToEndAsync(Trip trip, Step step)
     {
-        return await _unitOfWork.Step.GetByIdAsync(stepId);
+        await _unitOfWork.Travel.RemoveLinkedTravelAsync(step);
+        await _unitOfWork.Step.MoveStepToEndAsync(trip, step);
     }
 
     /// <inheritdoc/>
-    public async Task MoveStepToEndAsync(Step step) => await _unitOfWork.Step.MoveStepToEndAsync(step);
+    public async Task MoveStepBeforeAsync(Trip trip, Step step, Step previousStep)
+    {
+        await _unitOfWork.Travel.RemoveLinkedTravelAsync(step);
+        await _unitOfWork.Travel.RemoveTravelBeforeStepAsync(previousStep);
+        await _unitOfWork.Step.MoveStepBeforeAsync(trip, step, previousStep);
+    }
 
     /// <inheritdoc/>
-    public async Task MoveStepBeforeAsync(Step step, Step previousStep) => await _unitOfWork.Step.MoveStepBeforeAsync(step, previousStep);
-
-    /// <inheritdoc/>
-    public async Task MoveStepAfterAsync(Step step, Step nextStep) => await _unitOfWork.Step.MoveStepAfterAsync(step, nextStep);
+    public async Task MoveStepAfterAsync(Trip trip, Step step, Step nextStep)
+    {
+        await _unitOfWork.Travel.RemoveLinkedTravelAsync(step);
+        await _unitOfWork.Travel.RemoveTravelAfterStepAsync(nextStep);
+        await _unitOfWork.Step.MoveStepAfterAsync(trip, step, nextStep);
+    }
 
     /// <inheritdoc/>
     public async Task<bool> IsStepExistById(Guid stepId) => await _unitOfWork.Step.IsExistAsync(stepId);
 
     /// <inheritdoc/>
-    public async Task DeleteStepAsync(Step step)
+    public async Task DeleteStepAsync(Trip trip, Step step)
     {
-        //Todo Delete Linked Travel To Step
+        await _unitOfWork.Travel.RemoveLinkedTravelAsync(step);
+        await _unitOfWork.Step.MoveStepToEndAsync(trip, step);
         await _unitOfWork.Step.RemoveStepAsync(step);
         await _unitOfWork.CompleteAsync();
     }
@@ -96,6 +112,7 @@ public class StepPlatform : IStepPlatform
     {
         step.Latitude = updateStepLocationDto.Latitude;
         step.Longitude = updateStepLocationDto.Longitude;
+        await _unitOfWork.Travel.RemoveLinkedTravelAsync(step);
         await _unitOfWork.Step.UpdateStepAsync(step);
         await _unitOfWork.CompleteAsync();
     }

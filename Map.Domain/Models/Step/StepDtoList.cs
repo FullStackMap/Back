@@ -1,9 +1,9 @@
 ﻿namespace Map.Domain.Models.Step;
 public class StepDtoList
 {
-    public Guid StepId { get; set; }
+    public int StepId { get; set; }
     public Guid TripId { get; set; }
-    public int StepNumber { get; set; }
+    public int Order { get; set; }
     public string? Name { get; set; }
 
     public DateTime? StartDate { get; set; }

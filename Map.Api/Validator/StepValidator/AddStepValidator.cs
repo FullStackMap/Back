@@ -1,14 +1,18 @@
 ﻿using FluentValidation;
 using Map.API.Extension;
 using Map.Domain.ErrorCodes;
+using Map.Domain.Models.AddTravel;
 using Map.Domain.Models.Step;
 
 namespace Map.API.Validator.StepValidator;
 
 public class AddStepValidator : AbstractValidator<AddStepDto>
 {
-    public AddStepValidator()
+    public AddStepValidator(IValidator<AddTravelDto> addTravelValidator)
     {
+        if (addTravelValidator is null)
+            throw new ArgumentNullException(nameof(addTravelValidator));
+
         RuleFor(dto => dto)
             //check if the dto is not empty
             .NotEmpty()

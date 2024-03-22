@@ -1,5 +1,6 @@
 ﻿using Map.Domain.Entities;
 using Map.EFCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Map.EFCore.Repositories;
 public class StepRepository : GenericRepository<Step>, IStepRepository
@@ -8,24 +9,25 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
     {
     }
     /// <inheritdoc/>
-    public Task AddStepLastAsync(Trip trip, Step step)
+    public async Task AddStepLastAsync(Trip trip, Step step)
     {
-        int lastOrder = trip.Steps.Last().Order;
-        step.Order = lastOrder++;
+        int lastOrder = trip.Steps.Any() ? trip.Steps.Last().Order : 0;
+        step.Order = lastOrder + 1;
 
-        _context.Step.Add(step);
-        return _context.SaveChangesAsync();
+        trip.Steps.Add(step);
+        await _context.SaveChangesAsync();
     }
 
     /// <inheritdoc/>
-    public Task AddStepAfterAsync(Trip trip, Step nextStep, Step step)
+    public async Task AddStepAfterAsync(Trip trip, Step nextStep, Step step)
     {
+        trip.Steps = trip.Steps.OrderBy(step => step.Order).ToList();
         int nextStepIndex = trip.Steps.ToList().FindIndex(s => s.Order == nextStep.Order);
 
         if (nextStepIndex is -1)
             throw new ArgumentException($"L'étape précédente : {nextStep},  n'as pas été trouver dans le trip : {trip}");
 
-        step.Order = nextStepIndex++;
+        step.Order = nextStep.Order + 1;
 
         for (int i = nextStepIndex + 1; i < trip.Steps.Count; i++)
         {
@@ -33,19 +35,20 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
         }
 
 
-        _context.Step.Add(step);
-        return _context.SaveChangesAsync();
+        trip.Steps.Add(step);
+        await _context.SaveChangesAsync();
     }
 
     /// <inheritdoc/>
-    public Task AddStepBeforAsync(Trip trip, Step previousStep, Step step)
+    public async Task AddStepBeforAsync(Trip trip, Step previousStep, Step step)
     {
+        trip.Steps = trip.Steps.OrderBy(step => step.Order).ToList();
         int previousStepIndex = trip.Steps.ToList().FindIndex(s => s.Order == previousStep.Order);
 
         if (previousStepIndex is -1)
             throw new ArgumentException($"L'étape suivante : {previousStep},  n'as pas été trouver dans le trip : {trip}");
 
-        step.Order = previousStepIndex--;
+        step.Order = previousStep.Order;
 
         for (int i = previousStepIndex; i < trip.Steps.Count; i++)
         {
@@ -53,14 +56,14 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
         }
 
 
-        _context.Step.Add(step);
-        return _context.SaveChangesAsync();
+        trip.Steps.Add(step);
+        await _context.SaveChangesAsync();
     }
 
     /// <inheritdoc/>
-    public Task MoveStepToEndAsync(Step step)
+    public async Task MoveStepToEndAsync(Trip trip, Step step)
     {
-        Trip trip = step.Trip;
+        trip.Steps = trip.Steps.OrderBy(step => step.Order).ToList();
         int stepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == step.StepId);
         int lastOrder = trip.Steps.Last().Order;
 
@@ -72,13 +75,14 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
 
         step.Order = lastOrder;
 
-        return _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 
     /// <inheritdoc/>
-    public Task MoveStepBeforeAsync(Step step, Step previousStep)
+    public async Task MoveStepBeforeAsync(Trip trip, Step step, Step previousStep)
     {
-        Trip trip = step.Trip;
+        trip.Steps = trip.Steps.OrderBy(step => step.Order).ToList();
+
         int stepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == step.StepId);
         int previousStepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == previousStep.StepId);
 
@@ -90,16 +94,17 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
 
         step.Order = previousStep.Order;
 
-        for (int i = previousStepIndex; i < trip.Steps.Count; i++)
+        for (int i = previousStepIndex; i < stepIndex; i++)
             trip.Steps[i].Order++;
 
-        return _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 
     /// <inheritdoc/>
-    public Task MoveStepAfterAsync(Step step, Step nextStep)
+    public async Task MoveStepAfterAsync(Trip trip, Step step, Step nextStep)
     {
-        Trip trip = step.Trip;
+        trip.Steps = trip.Steps.OrderBy(step => step.Order).ToList();
+
         int stepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == step.StepId);
         int nextStepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == nextStep.StepId);
 
@@ -109,34 +114,34 @@ public class StepRepository : GenericRepository<Step>, IStepRepository
         if (nextStepIndex is -1)
             throw new ArgumentException($"L'étape précédente : {nextStep},  n'as pas été trouver dans le trip : {trip}");
 
-        step.Order = nextStep.Order++;
+        step.Order = nextStep.Order;
 
-        for (int i = nextStepIndex + 1; i < trip.Steps.Count; i++)
-            trip.Steps[i].Order++;
-
-        return _context.SaveChangesAsync();
-    }
-
-    /// <inheritdoc/>
-    public Task RemoveStepAsync(Step step)
-    {
-        Trip trip = step.Trip;
-        int stepIndex = trip.Steps.ToList().FindIndex(s => s.StepId == step.StepId);
-
-        if (stepIndex is -1)
-            throw new ArgumentException($"L'étape : {step},  n'as pas été trouver dans le trip : {trip}");
-
-        for (int i = stepIndex + 1; i < trip.Steps.Count; i++)
+        for (int i = stepIndex + 1; i <= nextStepIndex; i++)
             trip.Steps[i].Order--;
 
-        _context.Step.Remove(step);
-        return _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 
     /// <inheritdoc/>
-    public Task UpdateStepAsync(Step step)
+    public async Task RemoveStepAsync(Step step)
+    {
+        _context.Step.Remove(step);
+        await _context.SaveChangesAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateStepAsync(Step step)
     {
         _context.Step.Update(step);
-        return _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
+
+    public async Task<Step?> GetStepByIdAsync(int stepId) => await _context.Step.Include(s => s.TravelBefore)
+        .Include(s => s.Trip)
+        .Include(s => s.TravelAfter)
+        .Include(s => s.TravelBefore.TravelRoad)
+        .Include(s => s.TravelAfter.TravelRoad)
+        .FirstOrDefaultAsync(s => s.StepId == stepId);
+
+    public async Task<Step?> GetByStepIdAsync(int stepId) => await _context.Step.FindAsync(stepId);
 }

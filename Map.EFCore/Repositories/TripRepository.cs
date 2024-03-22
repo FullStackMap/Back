@@ -14,6 +14,9 @@ public class TripRepository : GenericRepository<Trip>, ITripRepository
     public Task<List<Trip>> GetAllWhereUserId(Guid UserId) => _context.Trip.Where(t => t.UserId == UserId).ToListAsync();
 
     /// <inheritdoc/>
+    public async Task<Trip?> GetTripByIdAsync(Guid TripId) => await _context.Trip.Include(t => t.Steps).FirstOrDefaultAsync(t => t.TripId == TripId);
+
+    /// <inheritdoc/>
     public async Task<Trip> UpdateAsync(Trip trip, UpdateTripDto update)
     {
         trip.UserId = update.UserId;

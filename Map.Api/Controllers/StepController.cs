@@ -60,7 +60,7 @@ public class StepController : ControllerBase
     [HttpPost]
     [Route("{tripId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
-    [ProducesResponseType(typeof(StepDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(StepDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
@@ -70,20 +70,18 @@ public class StepController : ControllerBase
     public async Task<ActionResult<StepDto>> AddStepAsync([FromRoute] Guid tripId, [FromBody] AddStepDto addStepDto)
     {
         ValidationResult validationResult = _addStepValidator.Validate(addStepDto);
-
         if (!validationResult.IsValid)
-        {
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
-        }
 
         Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
         if (trip is null)
             return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Aucun voyage n'as été trouver avec cet Id"));
 
-        Step entity = _mapper.Map<AddStepDto, Step>(addStepDto);
-        await _stepPlatform.AddStepAsync(trip, entity);
+        Step newStep = _mapper.Map<AddStepDto, Step>(addStepDto);
 
-        return CreatedAtAction(nameof(GetStepByIdAsync), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
+        await _stepPlatform.AddStepAsync(trip, newStep);
+
+        return CreatedAtAction(nameof(GetStepById), new { stepId = newStep.StepId }, _mapper.Map<Step, StepDto>(newStep));
     }
 
     /// <summary>
@@ -120,9 +118,10 @@ public class StepController : ControllerBase
             return NotFound(new Error(ETripErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
         Step entity = _mapper.Map<AddStepDto, Step>(addStepDto);
+
         await _stepPlatform.AddStepBeforAsync(trip, nextStep, entity);
 
-        return CreatedAtAction(nameof(GetStepByIdAsync), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
+        return CreatedAtAction(nameof(GetStepById), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
     }
 
     /// <summary>
@@ -158,9 +157,10 @@ public class StepController : ControllerBase
             return NotFound(new Error(ETripErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
         Step entity = _mapper.Map<AddStepDto, Step>(addStepDto);
+
         await _stepPlatform.AddStepAfterAsync(trip, previousStep, entity);
 
-        return CreatedAtAction(nameof(GetStepByIdAsync), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
+        return CreatedAtAction(nameof(GetStepById), new { stepId = entity.StepId }, _mapper.Map<Step, StepDto>(entity));
     }
     #endregion
 
@@ -177,7 +177,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> GetStepByIdAsync([FromRoute] Guid stepId)
+    public async Task<ActionResult<StepDto>> GetStepById([FromRoute] int stepId)
     {
         Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
         if (step is null)
@@ -192,7 +192,7 @@ public class StepController : ControllerBase
     /// <param name="tripId">Id of wanted Trip</param>
     /// <returns>Collection of StepDtoList</returns>
     [HttpGet]
-    [Route("{tripId}")]
+    [Route("trips/{tripId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
     [ProducesResponseType(typeof(ICollection<StepDtoList>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
@@ -224,13 +224,17 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> MoveStepToEndAsync([FromRoute] Guid stepId)
+    public async Task<ActionResult<StepDto>> MoveStepToEndAsync([FromRoute] int stepId)
     {
         Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
         if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
-        await _stepPlatform.MoveStepToEndAsync(step);
+        Trip? trip = await _tripPlatform.GetTripByIdAsync(step.TripId);
+        if (trip is null)
+            return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Aucun voyage lier a cette étape."));
+
+        await _stepPlatform.MoveStepToEndAsync(trip, step);
 
         return _mapper.Map<Step, StepDto>(step);
     }
@@ -250,7 +254,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> MoveStepBefore([FromRoute] Guid stepId, [FromRoute] Guid previousStepId)
+    public async Task<ActionResult<StepDto>> MoveStepBefore([FromRoute] int stepId, [FromRoute] int previousStepId)
     {
         Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
         if (step is null)
@@ -260,13 +264,17 @@ public class StepController : ControllerBase
         if (previousStep is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
+        Trip? trip = await _tripPlatform.GetTripByIdAsync(step.TripId);
+        if (trip is null)
+            return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Aucun voyage lier a cette étape."));
+
         if (previousStep.TripId != step.TripId)
             return BadRequest(new Error(EStepErrorCodes.StepsNotInSameTrip.ToStringValue(), "Les étapes fournies ne sont pas dans le même voyage"));
 
-        if (previousStep.Order < step.Order)
-            return BadRequest(new Error(EStepErrorCodes.OrderNotInOrder.ToStringValue(), "L'étape suivante doit être après l'étape actuelle"));
+        if (previousStep.Order > step.Order)
+            return BadRequest(new Error(EStepErrorCodes.OrderNotInOrder.ToStringValue(), "L'étape précédente doit être avant l'étape actuelle"));
 
-        await _stepPlatform.MoveStepBeforeAsync(step, previousStep);
+        await _stepPlatform.MoveStepBeforeAsync(trip, step, previousStep);
 
         return _mapper.Map<Step, StepDto>(step);
     }
@@ -286,7 +294,7 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> MoveStepAfter([FromRoute] Guid stepId, [FromRoute] Guid nextStepId)
+    public async Task<ActionResult<StepDto>> MoveStepAfter([FromRoute] int stepId, [FromRoute] int nextStepId)
     {
         Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
         if (step is null)
@@ -296,13 +304,17 @@ public class StepController : ControllerBase
         if (nextStep is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
+        Trip? trip = await _tripPlatform.GetTripByIdAsync(step.TripId);
+        if (trip is null)
+            return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Aucun voyage lier a cette étape."));
+
         if (nextStep.TripId != step.TripId)
             return BadRequest(new Error(EStepErrorCodes.StepsNotInSameTrip.ToStringValue(), "Les étapes fournies ne sont pas dans le même voyage"));
 
-        if (nextStep.Order > step.Order)
+        if (nextStep.Order < step.Order)
             return BadRequest(new Error(EStepErrorCodes.OrderNotInOrder.ToStringValue(), "L'étape suivante doit être après l'étape actuelle"));
 
-        await _stepPlatform.MoveStepAfterAsync(step, nextStep);
+        await _stepPlatform.MoveStepAfterAsync(trip, step, nextStep);
 
         return _mapper.Map<Step, StepDto>(step);
     }
@@ -326,13 +338,13 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> UpdateStepNameAsync([FromRoute] Guid stepId, [FromBody] UpdateStepNameDto updateStepNameDto)
+    public async Task<ActionResult<StepDto>> UpdateStepNameAsync([FromRoute] int stepId, [FromBody] UpdateStepNameDto updateStepNameDto)
     {
         ValidationResult validationResult = _updateStepNameValidator.Validate(updateStepNameDto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        Step? step = await _stepPlatform.GetByStepIdAsync(stepId);
         if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
@@ -356,13 +368,13 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> UpdateStepDescriptionAsync([FromRoute] Guid stepId, [FromBody] UpdateStepDescriptionDto updateStepDescriptionDto)
+    public async Task<ActionResult<StepDto>> UpdateStepDescriptionAsync([FromRoute] int stepId, [FromBody] UpdateStepDescriptionDto updateStepDescriptionDto)
     {
         ValidationResult validationResult = _updateStepDescriptionValidator.Validate(updateStepDescriptionDto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        Step? step = await _stepPlatform.GetByStepIdAsync(stepId);
         if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
@@ -387,13 +399,13 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> UpdateStepDateAsync([FromRoute] Guid stepId, [FromBody] UpdateStepDateDto updateStepDateDto)
+    public async Task<ActionResult<StepDto>> UpdateStepDateAsync([FromRoute] int stepId, [FromBody] UpdateStepDateDto updateStepDateDto)
     {
         ValidationResult validationResult = _updateStepDateValidator.Validate(updateStepDateDto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        Step? step = await _stepPlatform.GetByStepIdAsync(stepId);
         if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
@@ -418,13 +430,13 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<StepDto>> UpdateStepLocationAsync([FromRoute] Guid stepId, [FromBody] UpdateStepLocationDto updateStepLocationDto)
+    public async Task<ActionResult<StepDto>> UpdateStepLocationAsync([FromRoute] int stepId, [FromBody] UpdateStepLocationDto updateStepLocationDto)
     {
         ValidationResult validationResult = _updateStepLocationValidator.Validate(updateStepLocationDto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
-        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        Step? step = await _stepPlatform.GetByStepIdAsync(stepId);
         if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
@@ -449,13 +461,15 @@ public class StepController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> DeleteStepByIdAsync([FromRoute] Guid stepId)
+    public async Task<ActionResult> DeleteStepByIdAsync([FromRoute] int stepId)
     {
-        Step? entity = await _stepPlatform.GetStepByIdAsync(stepId);
-        if (entity is null)
+        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
+        if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
-        await _stepPlatform.DeleteStepAsync(entity);
+        Trip? trip = await _tripPlatform.GetTripByIdAsync(step.TripId);
+
+        await _stepPlatform.DeleteStepAsync(trip, step);
         return NoContent();
     }
     #endregion

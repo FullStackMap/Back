@@ -28,7 +28,7 @@ public class TripPlatform : ITripPlatform
     }
 
     /// <inheritdoc/>
-    public async Task<Trip?> GetTripByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetByIdAsync(tripId);
+    public async Task<Trip?> GetTripByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetTripByIdAsync(tripId);
 
     /// <inheritdoc/>
     public async Task<List<Trip>> GetAllAsync() => await _unitOfWork.Trip.GetAllAsync();

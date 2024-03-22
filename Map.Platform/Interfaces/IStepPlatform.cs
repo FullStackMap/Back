@@ -32,33 +32,43 @@ public interface IStepPlatform
     /// Get a step by id
     /// </summary>
     /// <param name="stepId">Id of wanted Step</param>
+    /// <returns>step with all include if exist or null</returns>
+    Task<Step?> GetStepByIdAsync(int stepId);
+
+    /// <summary>
+    /// Get a step by id
+    /// </summary>
+    /// <param name="stepId">Id of wanted Step</param>
     /// <returns>step if exist or null</returns>
-    Task<Step?> GetStepByIdAsync(Guid stepId);
+    Task<Step?> GetByStepIdAsync(int stepId);
 
     /// <summary>
     /// Move a step to the end of the trip
     /// </summary>
+    /// <param name="trip">trip where step is</param>
     /// <param name="step">step to move</param>
-    Task MoveStepToEndAsync(Step step);
+    Task MoveStepToEndAsync(Trip trip, Step step);
 
     /// <summary>
     /// Move a step before another step
     /// </summary>
+    /// <param name="trip">trip where step is</param>
     /// <param name="step">step to move</param>
     /// <param name="previousStep">step where to move</param>
-    Task MoveStepBeforeAsync(Step step, Step previousStep);
+    Task MoveStepBeforeAsync(Trip trip, Step step, Step previousStep);
 
     /// <summary>
     /// Move a step after another step
     /// </summary>
+    /// <param name="trip">trip where step is</param>
     /// <param name="step">step to move</param>
     /// <param name="nextStep">step where to move</param>
-    Task MoveStepAfterAsync(Step step, Step nextStep);
+    Task MoveStepAfterAsync(Trip trip, Step step, Step nextStep);
 
     /// <summary>
     /// Delete a step
     /// </summary>
-    Task DeleteStepAsync(Step step);
+    Task DeleteStepAsync(Trip trip, Step step);
 
     /// <summary>
     /// Check if a step exist by id

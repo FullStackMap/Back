@@ -4,9 +4,9 @@ namespace Map.Domain.Models.Step;
 
 public class StepDto
 {
-    public Guid StepId { get; set; }
+    public int StepId { get; set; }
     public Guid TripId { get; set; }
-    public int StepNumber { get; set; }
+    public int Order { get; set; }
     public virtual TripDto? Trip { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }

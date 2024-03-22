@@ -19,4 +19,10 @@ public interface ITripRepository : IGenericRepository<Trip>
     /// <param name="update">update of entity</param>
     /// <returns>new trip version</returns>
     Task<Trip> UpdateAsync(Trip trip, UpdateTripDto update);
+
+    /// <summary>
+    /// Get a trip by id asynchronously with all its steps
+    /// </summary>
+    /// <param name="TripId"></param>
+    Task<Trip?> GetTripByIdAsync(Guid TripId);
 }

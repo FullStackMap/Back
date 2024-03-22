@@ -1,4 +1,6 @@
-﻿namespace Map.Domain.Models.Trip;
+﻿using Map.Domain.Models.Step;
+
+namespace Map.Domain.Models.Trip;
 
 /// <summary>
 /// Trip data transfer object.
@@ -33,6 +35,6 @@ public class TripDto
     /// Path of the background picture.
     /// </summary>
     public string BackgroundPicturePath { get; set; }
-    //Todo : Add steps
-    //public IList<Step>? Steps { get; set; }
+
+    public IList<StepDtoList>? Steps { get; set; }
 }

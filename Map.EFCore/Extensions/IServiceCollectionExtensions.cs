@@ -11,6 +11,8 @@ public static class IServiceCollectionExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped(typeof(ITripRepository), typeof(TripRepository));
+        services.AddScoped(typeof(IStepRepository), typeof(StepRepository));
+        services.AddScoped(typeof(ITravelRepository), typeof(TravelRepository));
 
         return services;
     }
