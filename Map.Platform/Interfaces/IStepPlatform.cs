@@ -29,7 +29,7 @@ public interface IStepPlatform
     Task AddStepAfterAsync(Trip trip, Step previousStep, Step entity);
 
     /// <summary>
-    /// Get a step by id
+    /// Get a step with all include by id
     /// </summary>
     /// <param name="stepId">Id of wanted Step</param>
     /// <returns>step with all include if exist or null</returns>
