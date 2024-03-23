@@ -426,6 +426,19 @@
         }
       }
     },
+    "/api/v1/Trip/Initialize": {
+      "post": {
+        "tags": [
+          "Trip"
+        ],
+        "operationId": "InitializePOST",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/Trip": {
       "post": {
         "tags": [
@@ -1380,6 +1393,78 @@
           }
         }
       }
+    },
+    "/api/v1/User/Contact": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "ContactMailAsyncPATCH",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1415,6 +1500,11 @@
             "type": "string",
             "description": "End date of the trip.",
             "format": "date",
+            "nullable": true
+          },
+          "backgroundPicturePath": {
+            "type": "string",
+            "description": "Path of the background picture.",
             "nullable": true
           }
         },
@@ -1467,6 +1557,28 @@
             "nullable": true
           },
           "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "body": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
             "type": "string",
             "nullable": true
           }
@@ -1559,27 +1671,38 @@
         "properties": {
           "tripId": {
             "type": "string",
+            "description": "Id of the trip.",
             "format": "uuid"
           },
           "userId": {
             "type": "string",
+            "description": "id of the user who created the trip.",
             "format": "uuid"
           },
           "name": {
             "type": "string",
+            "description": "Name of the trip.",
             "nullable": true
           },
           "description": {
             "type": "string",
+            "description": "Description of the trip.",
             "nullable": true
           },
           "startDate": {
             "type": "string",
+            "description": "Start date of the trip.",
             "format": "date"
           },
           "endDate": {
             "type": "string",
+            "description": "End date of the trip.",
             "format": "date"
+          },
+          "backgroundPicturePath": {
+            "type": "string",
+            "description": "Path of the background picture.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -1607,6 +1730,10 @@
           "endDate": {
             "type": "string",
             "format": "date"
+          },
+          "backgroundPicturePath": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

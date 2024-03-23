@@ -1,5 +1,4 @@
 ﻿using MailKit.Net.Smtp;
-using Map.Domain.Models.EmailDto;
 using Map.Domain.Settings;
 using Map.Provider.Interfaces;
 using MimeKit;

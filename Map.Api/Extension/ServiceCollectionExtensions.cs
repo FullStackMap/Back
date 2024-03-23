@@ -9,6 +9,7 @@ using Map.API.Validator.TripValidator;
 using Map.API.Validator.UserValidator;
 using Map.Domain.Entities;
 using Map.Domain.Models.AuthDto;
+using Map.Domain.Models.EmailDto;
 using Map.Domain.Models.TripDto;
 using Map.Domain.Settings;
 using Map.EFCore;
@@ -124,6 +125,7 @@ public static class ServiceCollectionExtensions
 
         #region UserValidator
         services.AddScoped<IValidator<UpdateUserMailDto>, UpdateUserMailValidator>();
+        services.AddScoped<IValidator<MailDto>, ContactMailValidator>();
         #endregion
         return services;
     }

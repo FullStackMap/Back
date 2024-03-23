@@ -123,7 +123,7 @@ public class AuthController : ControllerBase
         {
             Name = user.UserName,
             Email = user.Email,
-            Subject = "Bienvenue sur XXX",
+            Subject = "Bienvenue sur From-A2B",
             Body = emailTemplateText
         };
 
