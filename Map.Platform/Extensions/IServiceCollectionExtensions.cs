@@ -17,6 +17,8 @@ public static class IServiceCollectionExtensions
         services.AddScoped<IMailPlatform, MailPlatform>();
         services.AddScoped<IUserPlatform, UserPlatform>();
         services.AddScoped<IStepPlatform, StepPlatform>();
+        services.AddScoped<ITravelPlatform, TravelPlatform>();
+
 
         return services;
     }

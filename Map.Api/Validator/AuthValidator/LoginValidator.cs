@@ -5,7 +5,7 @@ using Map.Domain.Models.Auth;
 
 namespace Map.API.Validator.AuthValidator;
 
-public class LoginValidator : AbstractValidator<LoginDto>
+internal class LoginValidator : AbstractValidator<LoginDto>
 {
     public LoginValidator()
     {

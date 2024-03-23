@@ -4,7 +4,7 @@ using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
 
 namespace Map.Platform;
-public class StepPlatform : IStepPlatform
+internal class StepPlatform : IStepPlatform
 {
     #region Props
     private readonly IUnitOfWork _unitOfWork;

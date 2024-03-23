@@ -3,14 +3,9 @@ using Map.Domain.Settings;
 using Map.Platform.Interfaces;
 using Map.Provider.Interfaces;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Map.Platform;
-public class MailPlatform : IMailPlatform
+internal class MailPlatform : IMailPlatform
 {
     #region Props
 
@@ -22,7 +17,7 @@ public class MailPlatform : IMailPlatform
 
 
     #region Ctor
-    
+
     public MailPlatform(MailSettings mailSettings, IMailProvider mailProvider)
     {
         _mailSettings = mailSettings ?? throw new ArgumentNullException(nameof(mailSettings));
@@ -40,8 +35,8 @@ public class MailPlatform : IMailPlatform
 
     public async Task SendMailAsync(MailDto mailDto)
     {
-        MimeMessage email =  new();
-        
+        MimeMessage email = new();
+
         MailboxAddress mailFrom = new(_mailSettings.SenderName, _mailSettings.SenderMail);
         email.From.Add(mailFrom);
 

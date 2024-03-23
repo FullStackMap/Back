@@ -6,7 +6,7 @@ using Map.Platform.Interfaces;
 
 namespace Map.API.Validator.TravelValidator;
 
-public class AddTravelValidator : AbstractValidator<AddTravelDto>
+internal class AddTravelValidator : AbstractValidator<AddTravelDto>
 {
     public AddTravelValidator(IStepPlatform stepPlatform)
     {
@@ -14,40 +14,51 @@ public class AddTravelValidator : AbstractValidator<AddTravelDto>
             throw new ArgumentNullException(nameof(stepPlatform));
 
 
+        #region Dto
         RuleFor(dto => dto)
             //Check if the Travel is not empty
             .NotEmpty()
             .WithErrorCode(nameof(ETravelErrorCode.TravelNotEmpty))
             .WithMessage("Les données du trajet sont requises");
+        #endregion
 
+        #region TransportMode
         RuleFor(dto => dto.TransportMode)
             //Check if the TransportMode is not empty
             .NotEmpty()
             .WithErrorCode(nameof(ETravelErrorCode.TransportModeNotEmpty))
             .WithMessage("Le mode de transport est requis")
             .Unless(dto => dto is null);
+        #endregion
 
+        #region Distance
         RuleFor(dto => dto.Distance)
             //Check if the Distance is not empty
             .NotEmpty()
             .WithErrorCode(nameof(ETravelErrorCode.DistanceNotEmpty))
             .WithMessage("La distance pour ce trajet est requise")
             .Unless(dto => dto is null);
+        #endregion
 
+        #region Duration
         RuleFor(dto => dto.Duration)
             //Check if the DestinationStepId is not empty
             .NotEmpty()
             .WithErrorCode(nameof(ETravelErrorCode.DurationNotEmpty))
             .WithMessage("Le temp hestimer de ce trajet est requis")
             .Unless(dto => dto is null);
+        #endregion
 
+        #region OriginStepId
         RuleFor(dto => dto.OriginStepId)
             //Check if the DestinationStepId is not empty
             .NotEmpty()
             .WithErrorCode(nameof(ETravelErrorCode.OriginStepIdNotEmpty))
             .WithMessage("L'étape de départ est requise")
             .Unless(dto => dto is null);
+        #endregion
 
+        #region DestinationStepId
         RuleFor(dto => dto.DestinationStepId)
             //Check if the DestinationStepId is not empty
             .NotEmpty()
@@ -86,14 +97,17 @@ public class AddTravelValidator : AbstractValidator<AddTravelDto>
                 return originStep.Order == destinationStep.Order - 1;
             })
             .WithErrorCode(nameof(ETravelErrorCode.OriginStepOrderAndDestinationStepOrderNotSequential))
-            .WithMessage("L'étape de départ doit être avant l'étape de destination");
+            .WithMessage("L'étape de départ doit être l'étape précédente de la destination");
+        #endregion
 
+        #region TravelRoad
         RuleFor(dto => dto.TravelRoad)
             //Check if the DestinationStepId is not empty
             .NotEmpty()
             .WithErrorCode(nameof(ETravelErrorCode.TravelRoadNotEmpty))
             .WithMessage("Les données de la route de ce trajet sont requise")
             .Unless(dto => dto is null);
+        #endregion TravelRoad
 
     }
 }

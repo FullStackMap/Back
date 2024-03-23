@@ -6,7 +6,7 @@ using Map.Domain.Models.Step;
 
 namespace Map.API.Validator.StepValidator;
 
-public class AddStepValidator : AbstractValidator<AddStepDto>
+internal class AddStepValidator : AbstractValidator<AddStepDto>
 {
     public AddStepValidator(IValidator<AddTravelDto> addTravelValidator)
     {

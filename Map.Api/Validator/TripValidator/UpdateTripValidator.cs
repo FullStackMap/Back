@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.TripValidator;
 
-public class UpdateTripValidator : AbstractValidator<UpdateTripDto>
+internal class UpdateTripValidator : AbstractValidator<UpdateTripDto>
 {
     public UpdateTripValidator(ITripPlatform tripPlatform, UserManager<MapUser> userManager)
     {

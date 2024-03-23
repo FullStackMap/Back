@@ -29,10 +29,16 @@ public class TravelRepository : GenericRepository<Travel>, ITravelRepository
     public Task RemoveLinkedTravelAsync(Step step)
     {
         if (step.TravelBefore is not null)
+        {
             _context.Travel.Remove(step.TravelBefore);
+            _context.TravelRoad.Remove(step.TravelBefore.TravelRoad);
+        }
 
         if (step.TravelAfter is not null)
+        {
             _context.Travel.Remove(step.TravelAfter);
+            _context.TravelRoad.Remove(step.TravelAfter.TravelRoad);
+        }
 
         return _context.SaveChangesAsync();
 
@@ -43,7 +49,9 @@ public class TravelRepository : GenericRepository<Travel>, ITravelRepository
     {
         if (step.TravelAfter is null)
             return Task.CompletedTask;
+
         _context.Travel.Remove(step.TravelAfter);
+        _context.TravelRoad.Remove(step.TravelAfter.TravelRoad);
 
         return _context.SaveChangesAsync();
     }
@@ -53,7 +61,9 @@ public class TravelRepository : GenericRepository<Travel>, ITravelRepository
     {
         if (step.TravelBefore is null)
             return Task.CompletedTask;
+
         _context.Travel.Remove(step.TravelBefore);
+        _context.TravelRoad.Remove(step.TravelBefore.TravelRoad);
 
         return _context.SaveChangesAsync();
     }

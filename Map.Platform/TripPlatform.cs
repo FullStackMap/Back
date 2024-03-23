@@ -4,7 +4,7 @@ using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
 
 namespace Map.Platform;
-public class TripPlatform : ITripPlatform
+internal class TripPlatform : ITripPlatform
 {
     #region Props
 
