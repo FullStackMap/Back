@@ -9,8 +9,8 @@ public class Step
 
     public int Order { get; set; }
     public string Name { get; set; }
-    public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
+    public decimal Latitude { get; set; }
 
     public string? Description { get; set; }
     public DateTime? StartDate { get; set; }
