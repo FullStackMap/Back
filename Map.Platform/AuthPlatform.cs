@@ -81,5 +81,12 @@ internal class AuthPlatform : IAuthPlatform
 
     public async Task<IdentityResult?> ResetPasswordAsync(MapUser user, string password, string token) => await _userManager.ResetPasswordAsync(user, token, password);
 
+    public async Task<string> GenerateEmailUpdateTokenAsync(MapUser user, string newEmail)
+    {
+        string changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+        return $"{user.Id}?Token={changeEmailToken}&Email={newEmail}";
+    }
+    public async Task<IdentityResult> UpdateEmailAsync(MapUser user, string newEmail, string token) => await _userManager.ChangeEmailAsync(user, newEmail, token);
+
     #endregion Public Methods
 }

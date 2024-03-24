@@ -1,11 +1,6 @@
 ﻿using Map.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Map.Platform.Interfaces;
 
@@ -16,4 +11,6 @@ public interface IAuthPlatform
     Task<string> GenerateEmailConfirmationLinkAsync(MapUser user);
     Task<string> GeneratePasswordResetLinkAsync(MapUser user);
     Task<IdentityResult> ConfirmEmailAsync(MapUser user, string token);
+    Task<string> GenerateEmailUpdateTokenAsync(MapUser user, string newEmail);
+    Task<IdentityResult> UpdateEmailAsync(MapUser user, string newEmail, string token);
 }

@@ -2,11 +2,15 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
+using Map.API.Extension;
 using Map.API.MailTemplate;
 using Map.Domain.Entities;
+using Map.Domain.ErrorCodes;
 using Map.Domain.Models.Auth;
-using Map.Domain.Models.Email;
+using Map.Domain.Models.EmailDto;
+using Map.Domain.Models.Trip;
 using Map.Platform.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +31,7 @@ public class AuthController : ControllerBase
     private readonly IValidator<ConfirmMailDto> _confirmMailValidator;
     private readonly IValidator<ForgotPasswordDto> _forgotPasswordValidator;
     private readonly IValidator<ResetPasswordDto> _resetPasswordValidator;
+    private readonly IValidator<UpdateUserMailDto> _updateUserMailValidator;
     private readonly IAuthPlatform _authPlatform;
     private readonly IMailPlatform _mailPlatform;
     private readonly IMapper _mapper;
@@ -42,7 +47,8 @@ public class AuthController : ControllerBase
                           IValidator<ConfirmMailDto> confirmMailValidator,
                           IMailPlatform mailPlatform,
                           IValidator<ForgotPasswordDto> forgotPasswordValidator,
-                          IValidator<ResetPasswordDto> resetPasswordValidator)
+                          IValidator<ResetPasswordDto> resetPasswordValidator,
+                          IValidator<UpdateUserMailDto> updateUserMailValidator)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _loginValidator = loginValidator ?? throw new ArgumentNullException(nameof(loginValidator));
@@ -53,6 +59,7 @@ public class AuthController : ControllerBase
         _mailPlatform = mailPlatform ?? throw new ArgumentNullException(nameof(mailPlatform));
         _forgotPasswordValidator = forgotPasswordValidator ?? throw new ArgumentNullException(nameof(forgotPasswordValidator));
         _resetPasswordValidator = resetPasswordValidator ?? throw new ArgumentNullException(nameof(resetPasswordValidator));
+        _updateUserMailValidator = updateUserMailValidator;
     }
 
     #endregion
@@ -130,6 +137,39 @@ public class AuthController : ControllerBase
         await _mailPlatform.SendMailAsync(mailDto);
 
         return Created();
+    }
+
+    /// <summary>
+    /// Change user email
+    /// </summary>
+    /// <param name="userId">Id of user</param>
+    /// <param name="updateUserMailDto">UpdateUserMailDto</param>
+    /// <returns>MapUserDto with new Mail</returns>
+    [Authorize]
+    [HttpPatch]
+    [Route("{userId}/email")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(TripDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<Error>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<MapUserDto>> UpdateUserMailAsync([FromRoute] Guid userId, [FromBody] UpdateUserMailDto updateUserMailDto)
+    {
+        ValidationResult validationResult = await _updateUserMailValidator.ValidateAsync(updateUserMailDto);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
+
+        MapUser? user = await _userManager.FindByEmailAsync(updateUserMailDto.Mail);
+        if (user is null || user.Id != userId)
+        {
+            return BadRequest(new Error(EMapUserErrorCodes.UserNotFoundByEmail.ToStringValue(), "Utilisateur non trouvé"));
+        }
+
+        string changeEmailToken = await _authPlatform.GenerateEmailUpdateTokenAsync(user, updateUserMailDto.Mail);
+        IdentityResult? result = await _authPlatform.UpdateEmailAsync(user, updateUserMailDto.Mail, changeEmailToken);
+
+        return Ok(_mapper.Map<MapUser, MapUserDto>(user));
     }
 
 

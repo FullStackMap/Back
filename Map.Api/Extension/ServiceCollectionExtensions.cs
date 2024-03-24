@@ -8,9 +8,6 @@ using Map.API.Validator.TravelValidator;
 using Map.API.Validator.TripValidator;
 using Map.API.Validator.UserValidator;
 using Map.Domain.Entities;
-using Map.Domain.Models.AuthDto;
-using Map.Domain.Models.EmailDto;
-using Map.Domain.Models.TripDto;
 using Map.Domain.Models.AddTravel;
 using Map.Domain.Models.Auth;
 using Map.Domain.Models.Step;
@@ -132,7 +129,7 @@ public static class ServiceCollectionExtensions
 
         #region UserValidator
         services.AddScoped<IValidator<UpdateUserMailDto>, UpdateUserMailValidator>();
-        services.AddScoped<IValidator<MailDto>, ContactMailValidator>();
+        services.AddScoped<IValidator<SupportContactMailDto>, SupportContactMailValidator>();
         #endregion
 
         #region StepValidator

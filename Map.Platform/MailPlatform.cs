@@ -1,4 +1,4 @@
-﻿using Map.Domain.Models.Email;
+﻿using Map.Domain.Models.EmailDto;
 using Map.Domain.Settings;
 using Map.Platform.Interfaces;
 using Map.Provider.Interfaces;
@@ -37,11 +37,18 @@ internal class MailPlatform : IMailPlatform
     {
         MimeMessage email = new();
 
-        MailboxAddress mailFrom = new(_mailSettings.SenderName, _mailSettings.SenderMail);
+        MailboxAddress mailFrom = new(mailDto.SenderName ?? _mailSettings.NoReplyName,
+                                      mailDto.SenderMail ?? _mailSettings.NoReplyEmail);
         email.From.Add(mailFrom);
 
         MailboxAddress emailTo = new(mailDto.Name, mailDto.Email);
+        if (!mailDto.IsMailToUser)
+            emailTo = new(_mailSettings.SupportName, _mailSettings.SupportEmail);
+
         email.To.Add(emailTo);
+
+        if (mailDto.EmailOnCopy)
+            email.Cc.Add(new MailboxAddress(mailDto.Name, mailDto.Email));
 
         BodyBuilder bodyBuilder = new()
         {

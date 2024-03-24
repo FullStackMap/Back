@@ -1,10 +1,4 @@
-﻿using Map.Domain.Models.Email;
-using Map.Domain.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Map.Domain.Models.EmailDto;
 
 namespace Map.Platform.Interfaces;
 public interface IMailPlatform

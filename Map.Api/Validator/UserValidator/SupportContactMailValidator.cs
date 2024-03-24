@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
 using Map.API.Extension;
 using Map.Domain.ErrorCodes;
-using Map.Domain.Models.EmailDto;
+using Map.Domain.Models.User;
 
 namespace Map.API.Validator.UserValidator;
 
-public class ContactMailValidator : AbstractValidator<MailDto>
+public class SupportContactMailValidator : AbstractValidator<SupportContactMailDto>
 {
-    public ContactMailValidator()
+    public SupportContactMailValidator()
     {
 
         RuleFor(dto => dto)
