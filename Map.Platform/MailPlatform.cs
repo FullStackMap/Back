@@ -1,11 +1,11 @@
-﻿using Map.Domain.Models.EmailDto;
+﻿using Map.Domain.Models.Email;
 using Map.Domain.Settings;
 using Map.Platform.Interfaces;
 using Map.Provider.Interfaces;
 using MimeKit;
 
 namespace Map.Platform;
-public class MailPlatform : IMailPlatform
+internal class MailPlatform : IMailPlatform
 {
     #region Props
 

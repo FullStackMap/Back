@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Trip;
 
 namespace Map.API.AutoMapperProfies;
 
-public class TripProfiles : Profile
+internal class TripProfiles : Profile
 {
     public TripProfiles()
     {

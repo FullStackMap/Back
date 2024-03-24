@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
 using Map.API.Extension;
-using Map.API.Models.UserDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
+using Map.Domain.Models.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.UserValidator;
 
-public class UpdateUserMailValidator : AbstractValidator<UpdateUserMailDto>
+internal class UpdateUserMailValidator : AbstractValidator<UpdateUserMailDto>
 {
     public UpdateUserMailValidator(UserManager<MapUser> userManager)
     {

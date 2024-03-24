@@ -3,7 +3,7 @@ using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.Platform;
-public class UserPlatform : IUserPlatform
+internal class UserPlatform : IUserPlatform
 {
     #region Props
 

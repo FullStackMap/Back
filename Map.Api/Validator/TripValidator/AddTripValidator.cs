@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
+using Map.Domain.Models.Trip;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.TripValidator;
 
-public class AddTripValidator : AbstractValidator<AddTripDto>
+internal class AddTripValidator : AbstractValidator<AddTripDto>
 {
     public AddTripValidator(ITripPlatform tripPlatform, UserManager<MapUser> userManager)
     {

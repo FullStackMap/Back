@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Map.API.Extension;
 using Map.Domain.ErrorCodes;
-using Map.Domain.Models.AuthDto;
+using Map.Domain.Models.Auth;
 
 namespace Map.API.Validator.AuthValidator;
 
-public class LoginValidator : AbstractValidator<LoginDto>
+internal class LoginValidator : AbstractValidator<LoginDto>
 {
     public LoginValidator()
     {

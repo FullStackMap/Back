@@ -10,6 +10,8 @@ public class UnitOfWork : IUnitOfWork
     private readonly MapContext _context;
 
     public ITripRepository Trip { get; }
+    public IStepRepository Step { get; }
+    public ITravelRepository Travel { get; }
 
     #endregion Properties
 
@@ -19,6 +21,8 @@ public class UnitOfWork : IUnitOfWork
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         Trip = new TripRepository(_context);
+        Step = new StepRepository(_context);
+        Travel = new TravelRepository(_context);
     }
 
     #endregion Constructor

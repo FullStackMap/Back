@@ -1,4 +1,5 @@
-﻿using Map.EFCore.Interfaces;
+﻿using Map.EFCore.Data;
+using Map.EFCore.Interfaces;
 using Map.EFCore.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,8 @@ public static class IServiceCollectionExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped(typeof(ITripRepository), typeof(TripRepository));
+        services.AddScoped(typeof(IStepRepository), typeof(StepRepository));
+        services.AddScoped(typeof(ITravelRepository), typeof(TravelRepository));
 
         return services;
     }

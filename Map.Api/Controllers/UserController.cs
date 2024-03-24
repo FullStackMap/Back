@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
@@ -10,6 +10,9 @@ using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AuthDto;
 using Map.Domain.Models.EmailDto;
+using Map.Domain.Models.Auth;
+using Map.Domain.Models.Trip;
+using Map.Domain.Models.User;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

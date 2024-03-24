@@ -2,11 +2,10 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
-using Map.Domain.Models.TripDto;
-using Map.EFCore;
+using Map.Domain.Models.Trip;
+using Map.EFCore.Data;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +14,7 @@ using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
+[Authorize(Roles = Roles.User)]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -49,17 +49,30 @@ public class TripController : ControllerBase
 
     #endregion
 
+#if DEBUG
+    /// <summary>
+    /// Permet d'initialiser la base de données
+    /// </summary>
+    /// <param name="force">Cette option supprime intégralement la donnée et réaplique une initialisation par dessus</param>
     [AllowAnonymous]
     [HttpPost]
     [Route("Initialize")]
     [MapToApiVersion(ApiControllerVersions.V1)]
-    public async Task<IActionResult> Initialize([FromServices] DBInitializer dBInitializer)
+    public async Task<IActionResult> Initialize([FromServices] DBInitializer dBInitializer, [FromQuery] bool force = false)
     {
-        bool result = await dBInitializer.Initialize();
-        string resultMessage = $"Initialisation DB : {(result ? "Succès" : "DB existe déja")}";
+        bool result = await dBInitializer.Initialize(force);
+
+
+        string resultMessage = $"""
+            Initialisation DB
+            -> Result: {(result ? "Succès" : "La DB existe déja")}
+
+            {(!result && !force ? "-> Utilise le query param 'force' pour forcer l'initialisation. Attention, cela supprimera toutes les données de la DB" : null)}
+            """;
 
         return Ok(resultMessage);
     }
+#endif
 
     /// <summary>
     /// Create a new trip

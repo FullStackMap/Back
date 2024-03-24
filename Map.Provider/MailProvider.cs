@@ -4,7 +4,7 @@ using Map.Provider.Interfaces;
 using MimeKit;
 
 namespace Map.Provider;
-public class MailProvider : IMailProvider
+internal class MailProvider : IMailProvider
 {
     #region Props
 

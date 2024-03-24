@@ -1,10 +1,10 @@
 ﻿using Map.Domain.Entities;
+using Map.Domain.Models.Trip;
 using Map.EFCore.Interfaces;
 using Map.Platform.Interfaces;
-using Map.Domain.Models.TripDto;
 
 namespace Map.Platform;
-public class TripPlatform : ITripPlatform
+internal class TripPlatform : ITripPlatform
 {
     #region Props
 
@@ -28,7 +28,7 @@ public class TripPlatform : ITripPlatform
     }
 
     /// <inheritdoc/>
-    public async Task<Trip?> GetTripByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetByIdAsync(tripId);
+    public async Task<Trip?> GetTripByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetTripByIdAsync(tripId);
 
     /// <inheritdoc/>
     public async Task<List<Trip>> GetAllAsync() => await _unitOfWork.Trip.GetAllAsync();

@@ -12,6 +12,20 @@ public interface IGenericRepository<T> where T : class
     T? GetById(Guid id);
 
     /// <summary>
+    /// Check if a T exist by id.
+    /// </summary>
+    /// <param name="id">The id.</param>
+    /// <returns>A bool.</returns>
+    bool IsExist(Guid id);
+
+    /// <summary>
+    /// Check if a T exist by id async.
+    /// </summary>
+    /// <param name="id">The id.</param>
+    /// <returns>A bool.</returns>
+    Task<bool> IsExistAsync(Guid id);
+
+    /// <summary>
     /// Gets T all.
     /// </summary>
     /// <returns>A list of TS.</returns>

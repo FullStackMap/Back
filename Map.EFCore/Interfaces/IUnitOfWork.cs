@@ -5,6 +5,8 @@ public interface IUnitOfWork : IDisposable
     #region Properties
 
     ITripRepository Trip { get; }
+    IStepRepository Step { get; }
+    ITravelRepository Travel { get; }
 
     #endregion Properties
 
