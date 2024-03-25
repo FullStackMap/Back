@@ -4,6 +4,7 @@ using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
 using Map.API.Validator.AuthValidator;
 using Map.API.Validator.StepValidator;
+using Map.API.Validator.TestimonialValidator;
 using Map.API.Validator.TravelValidator;
 using Map.API.Validator.TripValidator;
 using Map.API.Validator.UserValidator;
@@ -11,6 +12,7 @@ using Map.Domain.Entities;
 using Map.Domain.Models.AddTravel;
 using Map.Domain.Models.Auth;
 using Map.Domain.Models.Step;
+using Map.Domain.Models.Testimonial;
 using Map.Domain.Models.Trip;
 using Map.Domain.Models.User;
 using Map.Domain.Settings;
@@ -67,7 +69,8 @@ public static class ServiceCollectionExtensions
         .AddAutoMapper(typeof(TripProfiles))
         .AddAutoMapper(typeof(UserProfiles))
         .AddAutoMapper(typeof(StepProfiles))
-        .AddAutoMapper(typeof(TravelProfiles));
+        .AddAutoMapper(typeof(TravelProfiles))
+        .AddAutoMapper(typeof(TestimonialProfiles));
 
     /// <summary>
     /// Adds the services.
@@ -141,6 +144,10 @@ public static class ServiceCollectionExtensions
 
         #region TravelValidator
         services.AddScoped<IValidator<AddTravelDto>, AddTravelValidator>();
+        #endregion
+
+        #region TestimonialValidator
+        services.AddScoped<IValidator<AddTestimonialDto>, AddTestimonialValidator>();
         #endregion
         return services;
     }

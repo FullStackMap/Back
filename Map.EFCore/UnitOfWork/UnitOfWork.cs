@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     public ITripRepository Trip { get; }
     public IStepRepository Step { get; }
     public ITravelRepository Travel { get; }
+    public ITestimonialRepository Testimonial { get; }
 
     #endregion Properties
 
@@ -23,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
         Trip = new TripRepository(_context);
         Step = new StepRepository(_context);
         Travel = new TravelRepository(_context);
+        Testimonial = new TestimonialRepository(_context);
     }
 
     #endregion Constructor

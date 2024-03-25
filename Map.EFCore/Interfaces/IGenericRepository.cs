@@ -12,6 +12,13 @@ public interface IGenericRepository<T> where T : class
     T? GetById(Guid id);
 
     /// <summary>
+    /// Gets T by id.
+    /// </summary>
+    /// <param name="id">The id.</param>
+    /// <returns>A     T? .</returns>
+    T? GetById(int id);
+
+    /// <summary>
     /// Check if a T exist by id.
     /// </summary>
     /// <param name="id">The id.</param>
@@ -43,6 +50,13 @@ public interface IGenericRepository<T> where T : class
     /// <param name="id">The id.</param>
     /// <returns>A Task.</returns>
     Task<T?> GetByIdAsync(Guid id);
+
+    /// <summary>
+    /// Gets T by id async.
+    /// </summary>
+    /// <param name="id">The id.</param>
+    /// <returns>A Task.</returns>
+    Task<T?> GetByIdAsync(int id);
 
     /// <summary>
     /// Finds T.

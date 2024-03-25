@@ -14,6 +14,7 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
     public DbSet<Step> Step { get; set; }
     public DbSet<Travel> Travel { get; set; }
     public DbSet<TravelRoad> TravelRoad { get; set; }
+    public DbSet<Testimonial> Testimonial { get; set; }
 
     #endregion Properties
 
@@ -132,6 +133,22 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
             tr.HasOne(tr => tr.Travel)
                 .WithOne(tr => tr.TravelRoad)
                 .HasForeignKey<Travel>(t => t.TravelId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Testimonial>(t =>
+        {
+            t.ToTable("Testimonials");
+            t.HasKey(t => t.TestimonialId);
+
+            t.Property(t => t.FeedBack).IsRequired().HasMaxLength(500);
+            t.Property(t => t.UserId).IsRequired();
+            t.Property(t => t.rate).IsRequired();
+            t.Property(t => t.TestimonialDate).IsRequired();
+
+            t.HasOne(t => t.User)
+                .WithMany(u => u.Testimonials)
+                .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

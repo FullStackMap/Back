@@ -60,7 +60,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Login user
     /// </summary>
-    /// <remarks> {  "email": "antoine.capitain+MapPfe@gmail.com",  "password": "NMdRx$HqyT8jX6" }</remarks>
+    /// <remarks> {  "email": "dercraker@from-a2b.fr",  "password": "NMdRx$HqyT8jX6" }</remarks>
     /// <param name="loginDto">LoginDto</param>
     [HttpPost]
     [Route("Login")]
