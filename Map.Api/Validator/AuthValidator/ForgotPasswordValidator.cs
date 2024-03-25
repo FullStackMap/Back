@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
 
-public class ForgotPasswordValidator : AbstractValidator<ForgotPasswordDto>
+internal class ForgotPasswordValidator : AbstractValidator<ForgotPasswordDto>
 {
     private readonly UserManager<MapUser> _userManager;
     public ForgotPasswordValidator(UserManager<MapUser> userManager)

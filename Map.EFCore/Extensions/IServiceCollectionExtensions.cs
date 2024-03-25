@@ -1,4 +1,5 @@
-﻿using Map.EFCore.Interfaces;
+﻿using Map.EFCore.Data;
+using Map.EFCore.Interfaces;
 using Map.EFCore.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 

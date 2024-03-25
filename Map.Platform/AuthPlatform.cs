@@ -3,17 +3,13 @@ using Map.Domain.Settings;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Map.Platform;
 
-public class AuthPlatform : IAuthPlatform
+internal class AuthPlatform : IAuthPlatform
 {
     #region Properties
 

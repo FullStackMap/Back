@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
 
-public class RegisterValidator : AbstractValidator<RegisterDto>
+internal class RegisterValidator : AbstractValidator<RegisterDto>
 {
     #region Props
 

@@ -4,7 +4,7 @@ using Map.Domain.Models.Step;
 
 namespace Map.API.AutoMapperProfies;
 
-public class StepProfiles : Profile
+internal class StepProfiles : Profile
 {
     public StepProfiles()
     {

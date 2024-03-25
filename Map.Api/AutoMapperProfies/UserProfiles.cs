@@ -4,7 +4,7 @@ using Map.Domain.Models.Auth;
 
 namespace Map.API.AutoMapperProfies;
 
-public class UserProfiles : Profile
+internal class UserProfiles : Profile
 {
     public UserProfiles()
     {

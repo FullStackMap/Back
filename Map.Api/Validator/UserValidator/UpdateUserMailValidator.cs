@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.UserValidator;
 
-public class UpdateUserMailValidator : AbstractValidator<UpdateUserMailDto>
+internal class UpdateUserMailValidator : AbstractValidator<UpdateUserMailDto>
 {
     public UpdateUserMailValidator(UserManager<MapUser> userManager)
     {

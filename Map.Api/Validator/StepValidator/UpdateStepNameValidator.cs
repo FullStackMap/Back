@@ -5,7 +5,7 @@ using Map.Domain.Models.Step;
 
 namespace Map.API.Validator.StepValidator;
 
-public class UpdateStepNameValidator : AbstractValidator<UpdateStepNameDto>
+internal class UpdateStepNameValidator : AbstractValidator<UpdateStepNameDto>
 {
     public UpdateStepNameValidator()
     {

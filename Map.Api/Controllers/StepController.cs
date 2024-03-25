@@ -7,12 +7,13 @@ using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.Step;
 using Map.Platform.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
-//[Authorize(Roles = Roles.User)]
+[Authorize(Roles = Roles.User)]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]

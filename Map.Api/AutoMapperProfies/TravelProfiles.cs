@@ -4,7 +4,7 @@ using Map.Domain.Models.AddTravel;
 
 namespace Map.API.AutoMapperProfies;
 
-public class TravelProfiles : Profile
+internal class TravelProfiles : Profile
 {
     public TravelProfiles()
     {

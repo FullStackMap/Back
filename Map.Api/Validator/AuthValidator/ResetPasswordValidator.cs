@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
 
-public class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
+internal class ResetPasswordValidator : AbstractValidator<ResetPasswordDto>
 {
     private readonly UserManager<MapUser> _userManager;
     public ResetPasswordValidator(UserManager<MapUser> userManager)

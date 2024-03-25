@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Map.API.Validator.AuthValidator;
 
-public class ConfirmMailValidator : AbstractValidator<ConfirmMailDto>
+internal class ConfirmMailValidator : AbstractValidator<ConfirmMailDto>
 {
     #region Props
 
