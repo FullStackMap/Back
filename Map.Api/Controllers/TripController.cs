@@ -14,7 +14,7 @@ using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
-[Authorize(Roles = Roles.User)]
+//[Authorize(Roles = Roles.User)]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -49,7 +49,6 @@ public class TripController : ControllerBase
 
     #endregion
 
-#if DEBUG
     /// <summary>
     /// Permet d'initialiser la base de données
     /// </summary>
@@ -72,7 +71,6 @@ public class TripController : ControllerBase
 
         return Ok(resultMessage);
     }
-#endif
 
     /// <summary>
     /// Create a new trip

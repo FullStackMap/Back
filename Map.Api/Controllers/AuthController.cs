@@ -62,6 +62,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <remarks> {  "email": "dercraker@from-a2b.fr",  "password": "NMdRx$HqyT8jX6" }</remarks>
     /// <param name="loginDto">LoginDto</param>
+    /// <example> { "email": "dercraker@from-a2b.fr",  "password": "NMdRx$HqyT8jX6" }</example>
     [HttpPost]
     [Route("Login")]
     [MapToApiVersion(ApiControllerVersions.V1)]
