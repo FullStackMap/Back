@@ -1,5 +1,5 @@
 ﻿using Map.Domain.Entities;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Trip;
 
 namespace Map.Platform.Interfaces;
 public interface ITripPlatform

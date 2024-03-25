@@ -1,4 +1,4 @@
-﻿using Map.Domain.Models.EmailDto;
+﻿using Map.Domain.Models.Email;
 using Map.Domain.Settings;
 using System;
 using System.Collections.Generic;

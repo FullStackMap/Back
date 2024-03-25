@@ -2,14 +2,17 @@
 using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
-using Map.API.Models.TripDto;
-using Map.API.Models.UserDto;
 using Map.API.Validator.AuthValidator;
+using Map.API.Validator.StepValidator;
+using Map.API.Validator.TravelValidator;
 using Map.API.Validator.TripValidator;
 using Map.API.Validator.UserValidator;
 using Map.Domain.Entities;
-using Map.Domain.Models.AuthDto;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.AddTravel;
+using Map.Domain.Models.Auth;
+using Map.Domain.Models.Step;
+using Map.Domain.Models.Trip;
+using Map.Domain.Models.User;
 using Map.Domain.Settings;
 using Map.EFCore;
 using Map.EFCore.Extensions;
@@ -60,9 +63,11 @@ public static class ServiceCollectionExtensions
     /// Adds the auto mapper configuration.
     /// </summary>
     /// <param name="services">The services.</param>
-    public static void AddAutoMapperConfiguration(this IServiceCollection services) => services.AddAutoMapper(typeof(TripProfiles))
-                                                                                               .AddAutoMapper(typeof(UserProfiles));
-
+    public static void AddAutoMapperConfiguration(this IServiceCollection services) => services
+        .AddAutoMapper(typeof(TripProfiles))
+        .AddAutoMapper(typeof(UserProfiles))
+        .AddAutoMapper(typeof(StepProfiles))
+        .AddAutoMapper(typeof(TravelProfiles));
 
     /// <summary>
     /// Adds the services.
@@ -124,6 +129,18 @@ public static class ServiceCollectionExtensions
 
         #region UserValidator
         services.AddScoped<IValidator<UpdateUserMailDto>, UpdateUserMailValidator>();
+        #endregion
+
+        #region StepValidator
+        services.AddScoped<IValidator<AddStepDto>, AddStepValidator>();
+        services.AddScoped<IValidator<UpdateStepDateDto>, UpdateStepDateValidator>();
+        services.AddScoped<IValidator<UpdateStepDescriptionDto>, UpdateStepDescriptionValidator>();
+        services.AddScoped<IValidator<UpdateStepLocationDto>, UpdateStepLocationValidator>();
+        services.AddScoped<IValidator<UpdateStepNameDto>, UpdateStepNameValidator>();
+        #endregion
+
+        #region TravelValidator
+        services.AddScoped<IValidator<AddTravelDto>, AddTravelValidator>();
         #endregion
         return services;
     }

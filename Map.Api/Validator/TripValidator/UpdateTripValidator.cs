@@ -2,7 +2,7 @@ using FluentValidation;
 using Map.API.Extension;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Trip;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 

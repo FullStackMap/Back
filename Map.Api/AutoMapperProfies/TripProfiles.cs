@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using Map.API.Models.TripDto;
 using Map.Domain.Entities;
-using Map.Domain.Models.TripDto;
+using Map.Domain.Models.Trip;
 
 namespace Map.API.AutoMapperProfies;
 
