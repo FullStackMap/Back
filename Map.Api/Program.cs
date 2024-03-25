@@ -4,6 +4,8 @@ using Map.EFCore.IOC;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.SetupConfiguration();
+
 // Add Controllers to services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

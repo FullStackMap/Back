@@ -23,12 +23,23 @@ using Map.Provider.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace Map.API.Extension;
 
 public static class ServiceCollectionExtensions
 {
+    public static void SetupConfiguration(this ConfigurationManager configuration)
+    {
+        configuration
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
+            .AddUserSecrets(Assembly.GetExecutingAssembly());
+    }
+
+
     /// <summary>
     /// Configures the swagger.
     /// </summary>
