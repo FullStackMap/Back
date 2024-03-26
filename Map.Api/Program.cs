@@ -6,6 +6,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.SetupConfiguration();
 
+// Add Exception Handler
+builder.Services.ConfigureExceptionHandler();
+
 // Add Controllers to services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -60,6 +63,8 @@ app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

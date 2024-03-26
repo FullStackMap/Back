@@ -2,6 +2,7 @@
 using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
+using Map.API.Tools;
 using Map.API.Validator.AuthValidator;
 using Map.API.Validator.StepValidator;
 using Map.API.Validator.TestimonialValidator;
@@ -35,6 +36,12 @@ public static class ServiceCollectionExtensions
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables();
+    }
+
+    public static void ConfigureExceptionHandler(this IServiceCollection services)
+    {
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
     }
 
 
