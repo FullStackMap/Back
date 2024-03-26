@@ -24,8 +24,7 @@ public static class ServiceCollectionExtensions
         }
         else
         {
-            string? connectionString = configuration.GetConnectionString("Map_SQL") ?? throw new ArgumentNullException(nameof(connectionString));
-            Console.WriteLine($"Connection string: {connectionString}");
+            string connectionString = configuration.GetConnectionString("Map_SQL") ?? throw new ArgumentNullException(nameof(connectionString));
             services.AddDbContext<MapContext>(options =>
                 options.UseSqlServer(
                     connectionString,
