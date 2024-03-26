@@ -8,6 +8,9 @@ builder.Configuration.SetupConfiguration();
 
 builder.Services.ConfigureCache();
 
+// Add Exception Handler
+builder.Services.ConfigureExceptionHandler();
+
 // Add Controllers to services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -64,6 +67,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseOutputCache();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
