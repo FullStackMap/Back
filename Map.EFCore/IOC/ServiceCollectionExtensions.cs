@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
     public static void AddMapDbContext(this IServiceCollection services, ConfigurationManager configuration)
     {
         bool? inPipeline = Environment.GetEnvironmentVariable("USE_IN_MEMORY_DATABASE")?.ToLower() == "true";
+        string? connectionString = configuration.GetConnectionString("Map_SQL");
 
         if (inPipeline is true)
         {
@@ -24,11 +25,9 @@ public static class ServiceCollectionExtensions
         }
         else
         {
-            string? connectionString = configuration.GetConnectionString("Map_SQL") ?? throw new ArgumentNullException(nameof(connectionString));
-            Console.WriteLine($"Connection string: {connectionString}");
             services.AddDbContext<MapContext>(options =>
                 options.UseSqlServer(
-                    connectionString,
+                    string.IsNullOrWhiteSpace(connectionString) ? Environment.GetEnvironmentVariable("CONNECTION_STRING") : connectionString,
                     x => x.MigrationsAssembly(typeof(MapContext).Assembly.FullName)));
         }
 
