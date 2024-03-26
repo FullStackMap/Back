@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
@@ -42,6 +42,17 @@ public static class ServiceCollectionExtensions
     {
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+    }
+    public static void ConfigureCache(this IServiceCollection services)
+    {
+        services.AddOutputCache(o =>
+        {
+            o.AddBasePolicy(builder =>
+            {
+                builder.AddPolicy<CachePolicy>();
+                builder.Expire(TimeSpan.FromSeconds(120));
+            });
+        });
     }
 
 

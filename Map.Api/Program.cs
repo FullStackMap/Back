@@ -6,6 +6,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.SetupConfiguration();
 
+builder.Services.ConfigureCache();
+
 // Add Exception Handler
 builder.Services.ConfigureExceptionHandler();
 
@@ -63,6 +65,8 @@ app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseOutputCache();
 
 app.UseExceptionHandler();
 

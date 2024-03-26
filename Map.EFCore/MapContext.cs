@@ -143,7 +143,7 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
 
             t.Property(t => t.FeedBack).IsRequired().HasMaxLength(500);
             t.Property(t => t.UserId).IsRequired();
-            t.Property(t => t.rate).IsRequired();
+            t.Property(t => t.Rate).IsRequired();
             t.Property(t => t.TestimonialDate).IsRequired();
 
             t.HasOne(t => t.User)

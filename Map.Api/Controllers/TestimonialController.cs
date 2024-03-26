@@ -3,12 +3,14 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using Map.API.Extension;
+using Map.API.Tools;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.Testimonial;
 using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using static Map.API.Controllers.Models.HttpError;
 
@@ -25,15 +27,17 @@ public class TestimonialController : ControllerBase
     private readonly IValidator<AddTestimonialDto> _addTestimonialValidator;
     private readonly UserManager<MapUser> _userManager;
     private readonly ITestimonialPlatform _testimonialPlatform;
+    private readonly IOutputCacheStore _cache;
     #endregion
 
     #region Ctor
-    public TestimonialController(IMapper mapper, IValidator<AddTestimonialDto> addTestimonialValidator, UserManager<MapUser> userManager, ITestimonialPlatform testimonialPlatform)
+    public TestimonialController(IMapper mapper, IValidator<AddTestimonialDto> addTestimonialValidator, UserManager<MapUser> userManager, ITestimonialPlatform testimonialPlatform, IOutputCacheStore cache)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _addTestimonialValidator = addTestimonialValidator ?? throw new ArgumentNullException(nameof(addTestimonialValidator));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _testimonialPlatform = testimonialPlatform ?? throw new ArgumentNullException(nameof(testimonialPlatform));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     }
     #endregion
 
@@ -57,6 +61,8 @@ public class TestimonialController : ControllerBase
         ValidationResult validationResult = _addTestimonialValidator.Validate(dto);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(x => new Error(x.ErrorCode, x.ErrorMessage)));
+
+        await _cache.EvictByTagAsync(TagCacheNames.Testimonials, default);
 
         MapUser? user = await _userManager.Users.Include(u => u.Testimonials).FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
@@ -96,6 +102,7 @@ public class TestimonialController : ControllerBase
     /// </summary>
     [HttpGet]
     [Route("")]
+    [OutputCache(Tags = [TagCacheNames.Testimonials])]
     [MapToApiVersion(ApiControllerVersions.V1)]
     [ProducesResponseType(typeof(ICollection<TestimonialDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -123,6 +130,7 @@ public class TestimonialController : ControllerBase
         if (testimonial is null)
             return NotFound(new Error(ETestimonialErrorCodes.TestimonialNotFoundById.ToStringValue(), "Aucun témoignage trouvé avec cet Id"));
 
+        await _cache.EvictByTagAsync(TagCacheNames.Testimonials, default);
 
         await _testimonialPlatform.DeleteTestimonialAsync(testimonial);
         return NoContent();
