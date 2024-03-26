@@ -105,9 +105,7 @@ public class StepController : ControllerBase
         ValidationResult validationResult = _addStepValidator.Validate(addStepDto);
 
         if (!validationResult.IsValid)
-        {
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
-        }
 
         Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
         if (trip is null)
@@ -144,9 +142,7 @@ public class StepController : ControllerBase
         ValidationResult validationResult = _addStepValidator.Validate(addStepDto);
 
         if (!validationResult.IsValid)
-        {
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
-        }
 
         Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
         if (trip is null)

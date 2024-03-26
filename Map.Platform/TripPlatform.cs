@@ -31,7 +31,7 @@ internal class TripPlatform : ITripPlatform
     public async Task<Trip?> GetTripByIdAsync(Guid tripId) => await _unitOfWork.Trip.GetTripByIdAsync(tripId);
 
     /// <inheritdoc/>
-    public async Task<List<Trip>> GetAllAsync() => await _unitOfWork.Trip.GetAllAsync();
+    public IQueryable<Trip> GetAll() => _unitOfWork.Trip.GetAll();
 
     /// <inheritdoc/>
     public async Task<List<Trip>?> GetTripListByUserIdAsync(Guid userId) => await _unitOfWork.Trip.GetAllWhereUserId(userId);

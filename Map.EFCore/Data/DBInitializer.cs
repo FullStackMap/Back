@@ -9,6 +9,9 @@ public class DBInitializer
     private readonly MapContext _context;
     private readonly UserManager<MapUser> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+    private readonly Random _random;
+
+    private const string _password = "NMdRx$HqyT8jX6";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DBInitializer"/> class.
@@ -21,6 +24,7 @@ public class DBInitializer
         _context = context;
         _userManager = userManager;
         _roleManager = roleManager;
+        _random = new Random();
     }
 
     /// <summary>
@@ -29,20 +33,36 @@ public class DBInitializer
     /// <returns>A Task.</returns>
     public async Task<bool> Initialize(bool force)
     {
+
         _context.Database.EnsureCreated();
 
         if (!force && _context.Roles.Any() && _context.Users.Any())
             return false;
 
+        await ClearDatabase();
+
+        await AddRolesAsync();
+        await AddAdminAsync();
+        await AddSingleUserAsync();
+        await AddUsersAsync();
+        await AddTripsAsync();
+        await GenerateTestimonialsAsync();
+
+        return true;
+    }
+
+    private async Task ClearDatabase()
+    {
         await _context.TravelRoad.ExecuteDeleteAsync();
         await _context.Travel.ExecuteDeleteAsync();
         await _context.Trip.ExecuteDeleteAsync();
         await _context.MapUser.ExecuteDeleteAsync();
         await _context.Users.ExecuteDeleteAsync();
         await _context.Roles.ExecuteDeleteAsync();
+    }
 
-        #region AddRoles
-
+    private async Task AddRolesAsync()
+    {
         string[] roles = Roles.GetAllRoles();
 
         foreach (string role in roles)
@@ -56,12 +76,10 @@ public class DBInitializer
         }
 
         await _context.SaveChangesAsync();
+    }
 
-        #endregion
-
-        string pwd = "NMdRx$HqyT8jX6";
-        #region AddAdmin
-
+    private async Task AddAdminAsync()
+    {
         MapUser userAdmin = new()
         {
             UserName = "Dercraker",
@@ -71,8 +89,7 @@ public class DBInitializer
             PhoneNumberConfirmed = true,
         };
 
-
-        IdentityResult? resultAddUser = await _userManager.CreateAsync(userAdmin, pwd);
+        IdentityResult? resultAddUser = await _userManager.CreateAsync(userAdmin, _password);
         if (!resultAddUser.Succeeded)
             throw new ApplicationException("Adding user '" + userAdmin.UserName + "' failed with error(s): " + resultAddUser.Errors);
 
@@ -85,10 +102,10 @@ public class DBInitializer
             throw new ApplicationException("Adding user '" + userAdmin.UserName + "' to role '" + Roles.User + "' failed with error(s): " + resultAddRoleToUser.Errors);
 
         await _context.SaveChangesAsync();
+    }
 
-        #endregion
-
-        #region addSingleUser
+    private async Task AddSingleUserAsync()
+    {
         MapUser simpleUser = new()
         {
             UserName = "Dercraker2",
@@ -99,18 +116,19 @@ public class DBInitializer
         };
 
 
-        resultAddUser = await _userManager.CreateAsync(simpleUser, pwd);
+        IdentityResult resultAddUser = await _userManager.CreateAsync(simpleUser, _password);
         if (!resultAddUser.Succeeded)
             throw new ApplicationException("Adding user '" + simpleUser.UserName + "' failed with error(s): " + resultAddUser.Errors);
 
-        resultAddRoleToUser = await _userManager.AddToRoleAsync(simpleUser, Roles.User);
+        IdentityResult resultAddRoleToUser = await _userManager.AddToRoleAsync(simpleUser, Roles.User);
         if (!resultAddRoleToUser.Succeeded)
             throw new ApplicationException("Adding user '" + simpleUser.UserName + "' to role '" + Roles.User + "' failed with error(s): " + resultAddRoleToUser.Errors);
 
         await _context.SaveChangesAsync();
-        #endregion
+    }
 
-        #region AddUser
+    private async Task AddUsersAsync()
+    {
         List<MapUser> mapUsers = new List<MapUser>
         {
             new MapUser
@@ -161,21 +179,22 @@ public class DBInitializer
             user.EmailConfirmed = random.Next(2) == 0;
             user.PhoneNumberConfirmed = random.Next(2) == 0;
 
-            resultAddUser = await _userManager.CreateAsync(user, pwd);
+            IdentityResult resultAddUser = await _userManager.CreateAsync(user, _password);
             if (!resultAddUser.Succeeded)
                 throw new ApplicationException("Adding user '" + user.UserName + "' failed with error(s): " + resultAddUser.Errors);
 
-            resultAddRoleToUser = await _userManager.AddToRoleAsync(user, Roles.User);
+            IdentityResult resultAddRoleToUser = await _userManager.AddToRoleAsync(user, Roles.User);
             if (!resultAddRoleToUser.Succeeded)
                 throw new ApplicationException("Adding user '" + user.UserName + "' to role '" + Roles.User + "' failed with error(s): " + resultAddRoleToUser.Errors);
             await _context.SaveChangesAsync();
         }
-        #endregion
+    }
 
-        #region AddTrips
+    private async Task AddTripsAsync()
+    {
         foreach (MapUser user in _context.MapUser.ToList())
         {
-            int numTrips = random.Next(2, 11);
+            int numTrips = _random.Next(2, 11);
             for (int i = 0; i < numTrips; i++)
             {
                 Trip trip = new Trip
@@ -183,14 +202,14 @@ public class DBInitializer
                     User = user,
                     Name = $"Trip {i + 1} for {user.UserName}",
                     Description = $"Description for Trip {i + 1} for {user.UserName}",
-                    StartDate = new DateOnly(random.Next(2022, 2025), random.Next(1, 13), random.Next(1, 29)),
-                    EndDate = new DateOnly(random.Next(2022, 2025), random.Next(1, 13), random.Next(1, 29)),
+                    StartDate = new DateOnly(_random.Next(2022, 2025), _random.Next(1, 13), _random.Next(1, 29)),
+                    EndDate = new DateOnly(_random.Next(2022, 2025), _random.Next(1, 13), _random.Next(1, 29)),
                     BackgroundPicturePath = "https://via.placeholder.com/150"
                 };
 
                 await _context.Trip.AddAsync(trip);
 
-                int numSteps = random.Next(2, 6);
+                int numSteps = _random.Next(2, 6);
                 List<Step> steps = new List<Step>();
 
                 for (int j = 0; j < numSteps; j++)
@@ -200,8 +219,8 @@ public class DBInitializer
                         TripId = trip.TripId,
                         Order = j + 1,
                         Name = $"Step {j + 1} for Trip {i + 1} of user {user.UserName}",
-                        Longitude = (decimal)(random.NextDouble() * 360 - 180),
-                        Latitude = (decimal)(random.NextDouble() * 180 - 90),
+                        Longitude = (decimal)(_random.NextDouble() * 360 - 180),
+                        Latitude = (decimal)(_random.NextDouble() * 180 - 90),
                         Description = $"Description for Step {j + 1} for Trip {i + 1}",
                         StartDate = DateTime.Now.AddDays(j),
                         EndDate = DateTime.Now.AddDays(j + 1)
@@ -220,8 +239,8 @@ public class DBInitializer
                         OriginStep = steps[k],
                         DestinationStep = steps[k + 1],
                         TransportMode = "Mode of Transport",
-                        Distance = (decimal)random.NextDouble() * 1000,
-                        Duration = (decimal)random.NextDouble() * 24
+                        Distance = (decimal)_random.NextDouble() * 1000,
+                        Duration = (decimal)_random.NextDouble() * 24
                     };
                     TravelRoad travelRoad = new TravelRoad
                     {
@@ -236,10 +255,46 @@ public class DBInitializer
                 }
             }
         }
-
-        #endregion
-
-        return true;
     }
+
+    private async Task GenerateTestimonialsAsync()
+    {
+        foreach (MapUser user in _context.MapUser.ToList())
+        {
+            int numTestimonials = _random.Next(1, 4);
+            for (int i = 0; i < numTestimonials; i++)
+            {
+                Testimonial testimonial = new Testimonial
+                {
+                    FeedBack = GenerateRandomFeedback(),
+                    UserId = user.Id,
+                    User = user,
+                    Rate = _random.Next(1, 6),
+                    TestimonialDate = new DateOnly(_random.Next(2022, 2025), _random.Next(1, 13), _random.Next(1, 29))
+                };
+
+                _context.Testimonial.Add(testimonial);
+
+            }
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    private string GenerateRandomFeedback()
+    {
+        string[] feedbacks = new string[]
+        {
+                "Excellent service!",
+                "Très satisfait de mon voyage.",
+                "Personnel très professionnel.",
+                "Expérience incroyable.",
+                "Je recommande vivement!"
+        };
+
+        return feedbacks[_random.Next(feedbacks.Length)];
+    }
+
+
 }
 

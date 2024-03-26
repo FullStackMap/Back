@@ -19,10 +19,9 @@ public interface ITripPlatform
     public Task<Trip?> GetTripByIdAsync(Guid tripId);
 
     /// <summary>
-    /// Get all trips asynchronously
+    /// Get Queryable of all trips
     /// </summary>
-    /// <returns>List of trips</returns>
-    public Task<List<Trip>> GetAllAsync();
+    IQueryable<Trip> GetAll();
 
     /// <summary>
     /// Get all trips asynchronously by user id

@@ -10,6 +10,7 @@ using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
@@ -38,7 +39,8 @@ public class TripController : ControllerBase
                           UserManager<MapUser> userManager,
                           IValidator<AddTripDto> addTripValidator,
                           IValidator<UpdateTripDto> updateTripValidator,
-                          IMapper mapper)
+                          IMapper mapper,
+                          IOutputCacheStore cahce)
     {
         _tripPlatform = tripPlatform ?? throw new ArgumentNullException(nameof(tripPlatform));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -112,13 +114,11 @@ public class TripController : ControllerBase
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<TripDto>>> GetAllTripAsync()
+    public IQueryable<TripDto> GetAllTrip()
     {
-        List<Trip> entities = await _tripPlatform.GetAllAsync();
-        if (entities is null || !entities.Any())
-            return NoContent();
+        IQueryable<Trip> queryTrip = _tripPlatform.GetAll();
 
-        return _mapper.Map<List<Trip>, List<TripDto>>(entities);
+        return _mapper.ProjectTo<TripDto>(queryTrip);
     }
 
     /// <summary>
@@ -148,6 +148,7 @@ public class TripController : ControllerBase
     /// <param name="userId">User id of wanted Trips</param>
     [HttpGet]
     [Route("User/{userId}")]
+    [OutputCache(Tags = [$"Trips/Users/userId"])]
     [MapToApiVersion(ApiControllerVersions.V1)]
     [ProducesResponseType(typeof(List<TripDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]

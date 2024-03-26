@@ -2,6 +2,7 @@
 using FluentValidation;
 using Map.API.AutoMapperProfies;
 using Map.API.Configuration;
+using Map.API.Tools;
 using Map.API.Validator.AuthValidator;
 using Map.API.Validator.StepValidator;
 using Map.API.Validator.TestimonialValidator;
@@ -37,6 +38,17 @@ public static class ServiceCollectionExtensions
             .AddEnvironmentVariables();
     }
 
+    public static void ConfigureCache(this IServiceCollection services)
+    {
+        services.AddOutputCache(o =>
+        {
+            o.AddBasePolicy(builder =>
+            {
+                builder.AddPolicy<CachePolicy>();
+                builder.Expire(TimeSpan.FromSeconds(120));
+            });
+        });
+    }
 
     /// <summary>
     /// Configures the swagger.

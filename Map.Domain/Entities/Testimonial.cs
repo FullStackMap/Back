@@ -7,6 +7,6 @@ public class Testimonial
     public Guid UserId { get; set; }
     public virtual MapUser? User { get; set; }
 
-    public int rate { get; set; }
+    public int Rate { get; set; }
     public DateOnly TestimonialDate { get; set; }
 }
