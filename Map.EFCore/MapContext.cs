@@ -121,6 +121,11 @@ public class MapContext : IdentityDbContext<MapUser, IdentityRole<Guid>, Guid>
                 .WithOne(s => s.TravelBefore)
                 .HasForeignKey<Travel>(s => s.DestinationStepId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            t.HasOne(t => t.Trip)
+                .WithMany(t => t.Travels)
+                .HasForeignKey(t => t.TripId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<TravelRoad>(tr =>
