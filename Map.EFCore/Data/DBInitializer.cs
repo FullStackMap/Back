@@ -236,6 +236,7 @@ public class DBInitializer
                 {
                     Travel travel = new Travel
                     {
+                        TripId = trip.TripId,
                         OriginStep = steps[k],
                         DestinationStep = steps[k + 1],
                         TransportMode = "Mode of Transport",

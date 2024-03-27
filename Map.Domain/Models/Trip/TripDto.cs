@@ -1,4 +1,5 @@
 ﻿using Map.Domain.Models.Step;
+using Map.Domain.Models.Travels;
 
 namespace Map.Domain.Models.Trip;
 
@@ -37,4 +38,5 @@ public class TripDto
     public string BackgroundPicturePath { get; set; }
 
     public IList<StepDtoList>? Steps { get; set; }
+    public IList<TravelDtoList>? Travels { get; set; }
 }

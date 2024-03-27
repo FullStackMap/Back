@@ -190,18 +190,18 @@ public class StepController : ControllerBase
     [HttpGet]
     [Route("trips/{tripId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
-    [ProducesResponseType(typeof(ICollection<StepDtoList>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<StepDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ICollection<StepDtoList>>> GetStepsByTripIdAsync([FromRoute] Guid tripId)
+    public async Task<ActionResult<ICollection<StepDto>>> GetStepsByTripIdAsync([FromRoute] Guid tripId)
     {
         Trip? trip = await _tripPlatform.GetTripByIdAsync(tripId);
         if (trip is null)
             return NotFound(new Error(ETripErrorCodes.TripNotFoundById.ToStringValue(), "Voyage non trouvé par id"));
 
-        return Ok(_mapper.Map<ICollection<Step>, ICollection<StepDtoList>>(trip.Steps));
+        return Ok(_mapper.Map<ICollection<Step>, ICollection<StepDto>>(trip.Steps));
     }
     #endregion
 

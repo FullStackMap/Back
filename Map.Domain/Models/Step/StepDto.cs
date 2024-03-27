@@ -1,4 +1,5 @@
-﻿using Map.Domain.Models.Trip;
+﻿using Map.Domain.Models.Travels;
+using Map.Domain.Models.Trip;
 
 namespace Map.Domain.Models.Step;
 
@@ -16,7 +17,6 @@ public class StepDto
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
 
-    //TODO update this when TravelTo and Reservation are implemented
-    //public virtual IList<TravelTo>? TravelsTo { get; set; }
-    //public virtual IList<Reservation>? Reservations { get; set; }
+    public virtual TravelDto? TravelBefore { get; set; }
+    public virtual TravelDto? TravelAfter { get; set; }
 }

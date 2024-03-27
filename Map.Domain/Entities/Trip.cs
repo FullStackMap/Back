@@ -12,4 +12,5 @@ public class Trip
     public string BackgroundPicturePath { get; set; }
 
     public virtual IList<Step>? Steps { get; set; }
+    public virtual IList<Travel>? Travels { get; set; }
 }

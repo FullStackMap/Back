@@ -1196,7 +1196,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/StepDtoList"
+                    "$ref": "#/components/schemas/StepDto"
                   }
                 }
               },
@@ -1204,7 +1204,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/StepDtoList"
+                    "$ref": "#/components/schemas/StepDto"
                   }
                 }
               },
@@ -1212,7 +1212,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/StepDtoList"
+                    "$ref": "#/components/schemas/StepDto"
                   }
                 }
               }
@@ -3363,7 +3363,7 @@
           "Trip"
         ],
         "summary": "Get all trip",
-        "operationId": "GetAllTripAsyncGET",
+        "operationId": "GetAllTripGET",
         "responses": {
           "200": {
             "description": "Success",
@@ -4472,6 +4472,12 @@
           "longitude": {
             "type": "number",
             "format": "double"
+          },
+          "travelBefore": {
+            "$ref": "#/components/schemas/TravelDto"
+          },
+          "travelAfter": {
+            "$ref": "#/components/schemas/TravelDto"
           }
         },
         "additionalProperties": false
@@ -4495,6 +4501,10 @@
             "type": "string",
             "nullable": true
           },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "startDate": {
             "type": "string",
             "format": "date-time",
@@ -4504,6 +4514,14 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -4547,6 +4565,92 @@
         },
         "additionalProperties": false
       },
+      "TravelDto": {
+        "type": "object",
+        "properties": {
+          "travelId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "originStepId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "destinationStepId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "originStep": {
+            "$ref": "#/components/schemas/StepDto"
+          },
+          "destinationStep": {
+            "$ref": "#/components/schemas/StepDto"
+          },
+          "transportMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "distance": {
+            "type": "number",
+            "format": "double"
+          },
+          "duration": {
+            "type": "number",
+            "format": "double"
+          },
+          "travelRoad": {
+            "$ref": "#/components/schemas/TravelRoadDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TravelDtoList": {
+        "type": "object",
+        "properties": {
+          "travelId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "originStepId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "destinationStepId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "transportMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "distance": {
+            "type": "number",
+            "format": "double"
+          },
+          "duration": {
+            "type": "number",
+            "format": "double"
+          },
+          "travelRoad": {
+            "$ref": "#/components/schemas/TravelRoadDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TravelRoadDto": {
+        "type": "object",
+        "properties": {
+          "travelId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadCoordinates": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TripDto": {
         "type": "object",
         "properties": {
@@ -4582,6 +4686,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/StepDtoList"
+            },
+            "nullable": true
+          },
+          "travels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TravelDtoList"
             },
             "nullable": true
           }
