@@ -159,6 +159,7 @@ public static class ServiceCollectionExtensions
 
         #region UserValidator
         services.AddScoped<IValidator<UpdateUserMailDto>, UpdateUserMailValidator>();
+        services.AddScoped<IValidator<UpdateUserNameDto>, UpdateUserNameValidator>();
         #endregion
 
         #region StepValidator
