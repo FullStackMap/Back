@@ -432,7 +432,7 @@ public class StepController : ControllerBase
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
 
-        Step? step = await _stepPlatform.GetByStepIdAsync(stepId);
+        Step? step = await _stepPlatform.GetStepByIdAsync(stepId);
         if (step is null)
             return NotFound(new Error(EStepErrorCodes.StepNotFoundById.ToStringValue(), "Etape non trouvé par id"));
 
