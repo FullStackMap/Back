@@ -1,6 +1,8 @@
 ﻿using Map.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
+using System.Text.Json;
 
 namespace Map.EFCore.Data;
 
@@ -247,7 +249,7 @@ public class DBInitializer
                     {
                         TravelId = travel.TravelId,
                         Travel = travel,
-                        RoadCoordinates = "Coordinates of Road"
+                        RoadCoordinates = JsonSerializer.Serialize<Collection<Collection<decimal>>>([[steps[k].Longitude, steps[k].Latitude], [steps[k + 1].Longitude, steps[k + 1].Latitude]])
                     };
                     travel.TravelRoad = travelRoad;
                     steps[k].TravelAfter = travel;
