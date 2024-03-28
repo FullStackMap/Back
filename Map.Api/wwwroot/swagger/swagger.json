@@ -11,7 +11,7 @@
           "Auth"
         ],
         "summary": "Login user",
-        "description": "{  \"email\": \"dercraker@from-a2b.fr\",  \"password\": \"NMdRx$HqyT8jX6\" }",
+        "description": "User with Role Admin\r\n             { \"email\": \"dercraker@from-a2b.fr\", \"password\": \"NMdRx$HqyT8jX6\" }\r\n             User with Role User\r\n              { \"email\": \"dercraker@from-a2b.fr\", \"password\": \"NMdRx$HqyT8jX6\" }",
         "operationId": "LoginPOST",
         "requestBody": {
           "description": "LoginDto",
@@ -2682,11 +2682,13 @@
         "tags": [
           "Testimonial"
         ],
+        "summary": "Delete Testimonial By Id",
         "operationId": "DeleteTestimonialByIdDELETE",
         "parameters": [
           {
             "name": "testimonialId",
             "in": "path",
+            "description": "Id of the Testimonial to delete",
             "required": true,
             "style": "simple",
             "schema": {
@@ -4173,6 +4175,150 @@
           }
         }
       }
+    },
+    "/api/v1/User/{userId}/Username": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update user name",
+        "operationId": "UpdateUserNamePATCH",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "UpdateUserNameDto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserNameDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserNameDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserNameDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4788,14 +4934,30 @@
           }
         },
         "additionalProperties": false
+      },
+      "UpdateUserNameDto": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
       "Bearer": {
         "type": "http",
         "description": "JWT authorization header using the bearer scheme. <br />\r\nEnter your token in the text input below. <br />\r\nExample: '12345abcdef' <br />\r\nNB: A cookie will be added in order to remember the authentication during the session,\r\nif you try to logout using swagger logout feature this might not work.",
-        "scheme": "Bearer"
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
       }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
 }
