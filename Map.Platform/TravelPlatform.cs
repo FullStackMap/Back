@@ -16,6 +16,7 @@ internal class TravelPlatform : ITravelPlatform
     /// <inheritdoc/>
     public async Task AddTravelBetweenStepsAsync(Step origin, Step destination, Travel travel)
     {
+        travel.TripId = origin.TripId;
         await _unitOfWork.Travel.RemoveTravelAfterStepAsync(origin);
         await _unitOfWork.Travel.RemoveTravelBeforeStepAsync(destination);
         await _unitOfWork.Travel.AddAsync(travel);

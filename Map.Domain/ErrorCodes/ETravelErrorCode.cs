@@ -14,4 +14,5 @@ public enum ETravelErrorCode
     OriginStepOrderAndDestinationStepOrderNotSequential = 410,
     OriginStepIdAndDestinationStepIdNotTheSame = 411,
     OriginStepIdAndDestinationStepIdNotInSameTrip = 412,
+    TravelBetweenSameTrip = 413,
 }

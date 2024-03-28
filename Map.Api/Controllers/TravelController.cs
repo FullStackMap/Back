@@ -69,6 +69,9 @@ public class TravelController : ControllerBase
         if (destination == null)
             return BadRequest(new Error(nameof(EStepErrorCodes.StepNotFoundById), "L'étape de destination n'a pas été trouvée"));
 
+        if (origin.TripId != destination.TripId)
+            return BadRequest(new Error(nameof(ETravelErrorCode.TravelBetweenSameTrip), "Le trajet doit être entre deux étapes du même voyage"));
+
         await _travelPlatform.AddTravelBetweenStepsAsync(origin, destination, travel);
 
         return Ok();

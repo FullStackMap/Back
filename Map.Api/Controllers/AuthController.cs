@@ -184,7 +184,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
     {
-        ValidationResult validationResult = _forgotPasswordValidator.Validate(forgotPasswordDto);
+        ValidationResult validationResult = await _forgotPasswordValidator.ValidateAsync(forgotPasswordDto);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));
@@ -225,7 +225,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<Error>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
-        ValidationResult validationResult = _resetPasswordValidator.Validate(resetPasswordDto);
+        ValidationResult validationResult = await _resetPasswordValidator.ValidateAsync(resetPasswordDto);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors.Select(e => new Error(e.ErrorCode, e.ErrorMessage)));

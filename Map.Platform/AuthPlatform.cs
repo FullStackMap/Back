@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 namespace Map.Platform;
 
@@ -77,10 +78,15 @@ internal class AuthPlatform : IAuthPlatform
     public async Task<string> GeneratePasswordResetLinkAsync(MapUser user)
     {
         string resetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        resetPasswordToken = HttpUtility.UrlEncode(resetPasswordToken);
         return $"{_registerSettings.ResetPasswordUrl}?Token={resetPasswordToken}&Email={user.Email}";
     }
 
-    public async Task<IdentityResult?> ResetPasswordAsync(MapUser user, string password, string token) => await _userManager.ResetPasswordAsync(user, token, password);
+    public async Task<IdentityResult?> ResetPasswordAsync(MapUser user, string password, string token)
+    {
+        token = HttpUtility.UrlDecode(token);
+        return await _userManager.ResetPasswordAsync(user, token, password);
+    }
 
     #endregion Public Methods
 }

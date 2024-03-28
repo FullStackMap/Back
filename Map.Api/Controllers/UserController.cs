@@ -12,6 +12,7 @@ using Map.Platform.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
@@ -83,6 +84,28 @@ public class UserController : ControllerBase
         return Ok(_mapper.Map<MapUser, MapUserDto>(user));
     }
 
+    /// <summary>
+    /// Get user by id
+    /// </summary>
+    /// <param name="userId">Id of user</param>
+    [HttpGet]
+    [Route("{userId}/profile")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(typeof(MapUserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<MapUserDto>> GetUserById([FromRoute] Guid userId)
+    {
+        MapUser? user = await _userManager.Users.FirstOrDefaultAsync(user => user.Id == userId);
+
+        if (user is null)
+            return BadRequest(new Error(EMapUserErrorCodes.UserNotFoundByEmail.ToStringValue(), "Utilisateur non trouvé"));
+
+        return _mapper.Map<MapUser, MapUserDto>(user);
+    }
+
 
     /// <summary>
     /// Update user name
@@ -114,7 +137,6 @@ public class UserController : ControllerBase
         return _mapper.Map<MapUser, MapUserDto>(user);
     }
 
-    [Authorize]
     [HttpDelete]
     [Route("{userId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]
