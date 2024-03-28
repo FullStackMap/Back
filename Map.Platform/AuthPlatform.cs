@@ -58,6 +58,7 @@ internal class AuthPlatform : IAuthPlatform
             Expires = DateTime.UtcNow.AddHours(_jwtSettings.DurationTime),
             Issuer = _jwtSettings.ValidIssuer,
             Audience = _jwtSettings.ValidAudience,
+
             SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256Signature)
         };
 

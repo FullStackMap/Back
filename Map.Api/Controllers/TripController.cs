@@ -2,6 +2,7 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
+using Map.API.Tools;
 using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.Trip;
@@ -15,7 +16,7 @@ using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
-//[Authorize(Roles = Roles.User)]
+[Authorize]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -105,6 +106,7 @@ public class TripController : ControllerBase
     /// <summary>
     /// Get all trip
     /// </summary>
+    [Authorize(Policy = AuthorizePolicy.Admin)]
     [HttpGet]
     [Route("")]
     [MapToApiVersion(ApiControllerVersions.V1)]

@@ -21,15 +21,22 @@ using Map.EFCore;
 using Map.EFCore.Extensions;
 using Map.Platform.Extensions;
 using Map.Provider.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Security.Claims;
+using System.Text;
 
 namespace Map.API.Extension;
 
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Setups the configuration.
+    /// </summary>
     public static void SetupConfiguration(this ConfigurationManager configuration)
     {
         configuration
@@ -38,11 +45,66 @@ public static class ServiceCollectionExtensions
             .AddEnvironmentVariables();
     }
 
+    /// <summary>
+    /// Configures the exception handler.
+    /// </summary>
     public static void ConfigureExceptionHandler(this IServiceCollection services)
     {
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
     }
+
+    /// <summary>
+    /// Configures the authentication.
+    /// </summary>
+    public static void ConfigureAuthentication(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.IncludeErrorDetails = true;
+
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new()
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    //ValidIssuer = configuration["JWTSettings:ValidIssuer"],
+                    //ValidAudience = configuration["JWTSettings:ValidAudience"],
+                    RequireAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTSettings:Secret"])),
+                    ValidateLifetime = true,
+                    RoleClaimType = "Roles",
+                    NameClaimType = "User",
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+        services.AddAuthorization(options =>
+        {
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .RequireRole(Roles.User)
+                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                .Build();
+
+            options.AddPolicy("Admin", policy => policy.RequireRole(Roles.Admin));
+        });
+
+        services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(double.Parse(configuration["JWTSettings:DurationTime"])));
+    }
+
+    /// <summary>
+    /// Configures the cache.
+    /// </summary>
+    /// <param name="services"></param>
     public static void ConfigureCache(this IServiceCollection services)
     {
         services.AddOutputCache(o =>
@@ -81,7 +143,7 @@ public static class ServiceCollectionExtensions
             {
                 builder
                        .WithOrigins(originsAllowed.ToArray())
-                       .WithMethods("PUT", "DELETE", "GET", "OPTIONS", "POST")
+                       .WithMethods("PUT", "PATCH", "DELETE", "GET", "OPTIONS", "POST")
                        .AllowAnyHeader()
                        .Build();
             });

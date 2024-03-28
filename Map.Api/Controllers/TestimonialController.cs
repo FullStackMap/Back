@@ -8,6 +8,7 @@ using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.Testimonial;
 using Map.Platform.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -16,7 +17,7 @@ using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
-//[Authorize(Roles = Roles.User)]
+[Authorize]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -100,6 +101,7 @@ public class TestimonialController : ControllerBase
     /// <summary>
     /// Get All Testimonials    
     /// </summary>
+    [AllowAnonymous]
     [HttpGet]
     [Route("")]
     [OutputCache(Tags = [TagCacheNames.Testimonials])]
@@ -115,7 +117,12 @@ public class TestimonialController : ControllerBase
         return _mapper.ProjectTo<TestimonialDto>(testimonials);
     }
 
-    //[Authorize(Roles = Roles.Admin)]
+
+    /// <summary>
+    /// Delete Testimonial By Id
+    /// </summary>
+    /// <param name="testimonialId">Id of the Testimonial to delete</param>
+    [Authorize(Policy = AuthorizePolicy.Admin)]
     [HttpDelete]
     [Route("{testimonialId}")]
     [MapToApiVersion(ApiControllerVersions.V1)]

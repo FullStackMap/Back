@@ -11,6 +11,12 @@ builder.Services.ConfigureCache();
 // Add Exception Handler
 builder.Services.ConfigureExceptionHandler();
 
+//Configure Cors
+builder.Services.ConfigureCors(builder.Configuration);
+
+// Add Authorization
+builder.Services.ConfigureAuthentication(builder.Configuration);
+
 // Add Controllers to services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -19,8 +25,6 @@ builder.Services.AddSwaggerGen();
 //Ajout du MapContext
 builder.Services.AddMapDbContext(builder.Configuration);
 
-//Configure Cors
-builder.Services.ConfigureCors(builder.Configuration);
 
 //Configre API Versioning
 builder.Services.ConfigureApiVersionning();
@@ -50,6 +54,7 @@ if (displaySwagger)
         options.DisplayRequestDuration();
         options.EnableFilter();
         options.EnableTryItOutByDefault();
+        options.EnablePersistAuthorization();
 
         foreach (ApiVersionDescription description in apiVersionProvider.ApiVersionDescriptions)
         {
@@ -63,6 +68,8 @@ if (displaySwagger)
 app.UseCors();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

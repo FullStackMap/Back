@@ -16,6 +16,7 @@ using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
+[Authorize]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -56,7 +57,6 @@ public class UserController : ControllerBase
     /// <param name="userId">Id of user</param>
     /// <param name="updateUserMailDto">UpdateUserMailDto</param>
     /// <returns>MapUserDto with new Mail</returns>
-    [Authorize]
     [HttpPatch]
     [Route("{userId}/email")]
     [MapToApiVersion(ApiControllerVersions.V1)]
@@ -83,6 +83,12 @@ public class UserController : ControllerBase
         return Ok(_mapper.Map<MapUser, MapUserDto>(user));
     }
 
+
+    /// <summary>
+    /// Update user name
+    /// </summary>
+    /// <param name="updateUserNameDto">UpdateUserNameDto</param>
+    /// <param name="userId">Id of user</param>
     [HttpPatch]
     [Route("{userId}/Username")]
     [MapToApiVersion(ApiControllerVersions.V1)]

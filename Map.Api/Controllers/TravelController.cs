@@ -6,11 +6,13 @@ using Map.Domain.Entities;
 using Map.Domain.ErrorCodes;
 using Map.Domain.Models.AddTravel;
 using Map.Platform.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
+[Authorize]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -44,7 +46,6 @@ public class TravelController : ControllerBase
     /// Add Travel Between Steps
     /// </summary>
     /// <param name="addTravelDto">AddTravelDto</param>
-    //[Authorize]
     [HttpPost]
     [Route("AddTravelBetweenSteps")]
     [MapToApiVersion(ApiControllerVersions.V1)]
