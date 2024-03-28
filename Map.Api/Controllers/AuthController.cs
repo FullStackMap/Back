@@ -7,6 +7,7 @@ using Map.Domain.Entities;
 using Map.Domain.Models.Auth;
 using Map.Domain.Models.Email;
 using Map.Platform.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +16,7 @@ using static Map.API.Controllers.Models.HttpError;
 
 namespace Map.API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [ApiVersion(ApiControllerVersions.V1)]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -60,9 +62,12 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Login user
     /// </summary>
-    /// <remarks> {  "email": "dercraker@from-a2b.fr",  "password": "NMdRx$HqyT8jX6" }</remarks>
+    /// <remarks>User with Role Admin
+    ///  { "email": "dercraker@from-a2b.fr", "password": "NMdRx$HqyT8jX6" }
+    ///  User with Role User
+    ///   { "email": "dercraker@from-a2b.fr", "password": "NMdRx$HqyT8jX6" }
+    /// </remarks>
     /// <param name="loginDto">LoginDto</param>
-    /// <example> { "email": "dercraker@from-a2b.fr",  "password": "NMdRx$HqyT8jX6" }</example>
     [HttpPost]
     [Route("Login")]
     [MapToApiVersion(ApiControllerVersions.V1)]

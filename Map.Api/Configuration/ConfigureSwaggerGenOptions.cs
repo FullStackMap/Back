@@ -32,28 +32,35 @@ public class ConfigureSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
         options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
         options.CustomOperationIds(apiDescription => apiDescription.TryGetMethodInfo(out MethodInfo methodInfo) ? $"{methodInfo.Name}{apiDescription.HttpMethod}" : null);
-        options.AddSecurityDefinition(CdmOpenApiSecuritySchemes.CdmBearerId, CdmOpenApiSecuritySchemes.CdmBearer);
-    }
-}
-
-internal static class CdmOpenApiSecuritySchemes
-{
-    /// <summary>
-    /// The cdm bearer id.
-    /// </summary>
-    public const string CdmBearerId = "Bearer";
-
-    public static readonly OpenApiSecurityScheme CdmBearer = new()
-    {
-        Description = """
+        options.AddSecurityDefinition("Bearer", new()
+        {
+            Description = """
             JWT authorization header using the bearer scheme. <br />
             Enter your token in the text input below. <br />
             Example: '12345abcdef' <br />
             NB: A cookie will be added in order to remember the authentication during the session,
             if you try to logout using swagger logout feature this might not work.
             """,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = CdmBearerId }
-    };
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Scheme = "Bearer",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+        });
+
+        options.AddSecurityRequirement(new()
+        {
+            {
+                new()
+                {
+                    Reference = new()
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                },
+                new string[]{}
+            }
+        });
+    }
 }
