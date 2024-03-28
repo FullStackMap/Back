@@ -84,7 +84,6 @@ internal class AuthPlatform : IAuthPlatform
 
     public async Task<IdentityResult?> ResetPasswordAsync(MapUser user, string password, string token)
     {
-        token = HttpUtility.UrlDecode(token);
         return await _userManager.ResetPasswordAsync(user, token, password);
     }
 
