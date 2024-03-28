@@ -113,4 +113,24 @@ public class UserController : ControllerBase
 
         return _mapper.Map<MapUser, MapUserDto>(user);
     }
+
+    [Authorize]
+    [HttpDelete]
+    [Route("{userId}")]
+    [MapToApiVersion(ApiControllerVersions.V1)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<MapUserDto>> DeleteUserById([FromRoute] Guid userId)
+    {
+        MapUser? user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null || user.Id != userId)
+            return BadRequest(new Error(EMapUserErrorCodes.UserNotFoundByEmail.ToStringValue(), "Utilisateur non trouvé"));
+
+        await _userManager.DeleteAsync(user);
+
+        return NoContent();
+    }
 }
